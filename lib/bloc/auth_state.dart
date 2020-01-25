@@ -22,6 +22,13 @@ final User user;
   List<Object> get props => [user];
 }
 
+class RegisterState extends AuthState{
+
+  @override
+  List<Object> get props => [];
+
+}
+
 class RegisteredState extends AuthState {
 
 final User user;

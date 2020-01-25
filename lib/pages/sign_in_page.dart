@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ui_challenge/bloc/bloc.dart';
 import 'package:flutter_ui_challenge/pages/home.dart';
+import 'package:flutter_ui_challenge/widgets/loading_button.dart';
 
 import 'sign_up_page.dart';
 
@@ -72,42 +73,46 @@ class _SignInPageState extends State<SignInPage> {
                             labelStyle: TextStyle(color: Colors.grey[700]),
                             suffixIcon: Icon(Icons.remove_red_eye)),
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       BlocListener(
-                  bloc: _authBloc,
-                  listener: (BuildContext context, state) {
-                    if (state is LoggedInState) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => Home()));
-                    }
-                  },
-                  child: BlocBuilder<AuthBloc, AuthState>(
-                    bloc: _authBloc,
-                    builder: (BuildContext context, AuthState state) {
-                      if (state is LoggedInState) {
-                        // return Center(
-                        //     child: Text(
-                        //   "${state.user.email}",
-                        //   style: TextStyle(fontWeight: FontWeight.bold),
-                        // ));
-                        //   Navigator.of(context).push(
-                        // MaterialPageRoute(builder: (BuildContext context)=>SignUpPage()));
+                        bloc: _authBloc,
+                        listener: (BuildContext context, state) {
+                          if (state is LoggedInState) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (BuildContext context) => Home()));
+                          }
+                        },
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          bloc: _authBloc,
+                          builder: (BuildContext context, AuthState state) {
+                            if (state is LoggedInState) {
+                              // return Center(
+                              //     child: Text(
+                              //   "${state.user.email}",
+                              //   style: TextStyle(fontWeight: FontWeight.bold),
+                              // ));
+                              //   Navigator.of(context).push(
+                              // MaterialPageRoute(builder: (BuildContext context)=>SignUpPage()));
 
-                        return SizedBox.shrink();
-                      }
+                              return SizedBox.shrink();
+                            }
 
-                      if (state is ErrorState) {
-                        return Center(
-                            child: Text(
-                          "${state.error}",
-                          style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red),
-                        ));
-                      }
+                            if (state is ErrorState) {
+                              return Center(
+                                  child: Text(
+                                "${state.error}",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                              ));
+                            }
 
-                      return Text("");
-                    },
-                  ),
-                ),
+                            return Text("");
+                          },
+                        ),
+                      ),
                       SizedBox(
                         height: 50,
                       ),
@@ -115,7 +120,9 @@ class _SignInPageState extends State<SignInPage> {
                         bloc: _authBloc,
                         builder: (BuildContext context, state) {
                           if (state is LoadingState) {
-                            return _buildDisabledButton();
+                            return LoadingButton(
+                              text: "Signing in...",
+                            );
                           } else {
                             return InkWell(
                               onTap: () {
@@ -180,32 +187,4 @@ class _SignInPageState extends State<SignInPage> {
       ),
     );
   }
-}
-
-Widget _buildDisabledButton() {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 16),
-    decoration: BoxDecoration(color: Colors.blue[300]),
-    child: Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            height: 16,
-            width: 16,
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-            ),
-          ),
-          SizedBox(
-            width: 16,
-          ),
-          Text(
-            "signing in...",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    ),
-  );
 }
