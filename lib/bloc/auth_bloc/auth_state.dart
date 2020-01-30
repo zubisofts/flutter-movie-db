@@ -46,7 +46,7 @@ class LoadingState extends AuthState {
   List<Object> get props => [];
 }
 
-class EmailChangeState extends AuthState {
+class EmailChangeState{
 
   String email;
   EmailChangeState({

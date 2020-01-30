@@ -67,16 +67,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Stream<AuthState> registerUser() async*{
+  Stream<AuthState> registerUser() async* {
     yield LoadingState();
 
-    dynamic data=await respository.registerUser(email, fname, lname, password);
+    dynamic data =
+        await respository.registerUser(email, fname, lname, password);
 
-    if(data is User){
+    if (data is User) {
       yield RegisteredState(user: data);
-    }else{
+    } else {
       yield ErrorState(error: data);
     }
-
   }
 }

@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_ui_challenge/model/user.dart';
 
-class AuthRespository {
+class AuthRespository {  
+  
   FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userReference =
       Firestore.instance.collection("flutter_ui_challenge");
