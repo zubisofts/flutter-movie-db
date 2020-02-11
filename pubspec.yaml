@@ -29,6 +29,14 @@ dependencies:
   flutter_spinkit:  ^4.0.0
   youtube_player_flutter: ^6.0.3+2
   cached_network_image: ^2.0.0
+  image_downloader: ^0.19.1
+  shared_preferences: ^0.5.6+1
+  flutter_icons: ^1.0.0+1
+  intl: ^0.16.1
+  esys_flutter_share:
+  #  flutter_rating_bar: ^3.0.1+1
+  getflutter: ^1.0.5
+  # flutter_read_more_text: ^0.0.1
   # provider: ^4.0.1
   
 
@@ -54,8 +62,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
+  assets:
+   - assets/images/
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

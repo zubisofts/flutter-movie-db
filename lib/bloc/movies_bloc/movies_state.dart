@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_ui_challenge/model/movie.dart';
+import 'package:flutter_ui_challenge/model/credit.dart';
 import 'package:flutter_ui_challenge/model/movie_details.dart';
+import 'package:flutter_ui_challenge/model/movie_list.dart';
+import 'package:flutter_ui_challenge/model/person.dart';
+import 'package:flutter_ui_challenge/model/person_images.dart';
 import 'package:flutter_ui_challenge/model/video_details.dart';
 
 abstract class MoviesState extends Equatable {
@@ -14,12 +17,22 @@ class InitialMoviesState extends MoviesState {
 
 class LoadingState extends MoviesState {
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
 }
 
 class MoviesLoadedState extends MoviesState {
-  final List<Movie> movies;
+  final MovieList movies;
   MoviesLoadedState({
+    this.movies,
+  });
+
+  @override
+  List<Object> get props => [movies];
+}
+
+class MoreMoviesLoadedState extends MoviesState {
+  final MovieList movies;
+  MoreMoviesLoadedState({
     this.movies,
   });
 
@@ -30,12 +43,14 @@ class MoviesLoadedState extends MoviesState {
 class MovieDetailsReadyState extends MoviesState {
   final MovieDetails movieDetails;
   final VideoDetails videoDetails;
-  final List<Movie> similarMovies;
+  final MovieList similarMovies;
+  final Credit credit;
 
   MovieDetailsReadyState({
     this.movieDetails,
     this.videoDetails,
-    this.similarMovies
+    this.similarMovies,
+    this.credit,
   });
 
   @override
@@ -50,4 +65,24 @@ class MovieVideosReadyState extends MoviesState {
 
   @override
   List<Object> get props => [videoDetails];
+}
+
+class PersonDetialsState extends MoviesState {
+  final Person person;
+  PersonDetialsState({
+    this.person,
+  });
+
+  @override
+  List<Object> get props => [person];
+}
+
+class PersonImagesState extends MoviesState {
+  final PersonImages images;
+  PersonImagesState({
+    this.images,
+  });
+
+  @override
+  List<Object> get props => [images];
 }

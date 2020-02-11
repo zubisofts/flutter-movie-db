@@ -121,7 +121,7 @@ class MovieDetails {
 
   MovieDetails.fromJson(Map<String, dynamic> json) {
     _adult = json['adult'];
-    _backdropPath = IMAGE_URL+json['backdrop_path'];
+    _backdropPath = json['backdrop_path'];
     _budget = json['budget'];
     if (json['genres'] != null) {
       _genres = new List<Genres>();

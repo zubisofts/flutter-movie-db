@@ -7,6 +7,7 @@ final int id;
   final String releaseDate;
   final dynamic votes;
   final List genries;
+  final int page;
   
   Movie(
     {
@@ -18,6 +19,7 @@ final int id;
     this.releaseDate,
     this.votes,
     this.genries, 
+    this.page
   });
 
   

@@ -43,5 +43,9 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TODO</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TODO</string>
 </dict>
 </plist>
