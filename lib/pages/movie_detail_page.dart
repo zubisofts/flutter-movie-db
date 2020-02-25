@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_ui_challenge/model/movie_images.dart';
-import 'package:flutter_ui_challenge/pages/image_slide_screen.dart';
+import 'package:flutter_ui_challenge/bloc/auth_bloc/auth_bloc.dart';
+import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
+import 'package:flutter_ui_challenge/pages/sign_in_page.dart';
+import 'package:flutter_ui_challenge/widgets/auth_modal_form.dart';
 import 'package:getflutter/components/carousel/gf_carousel.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -11,18 +15,20 @@ import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
 import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_bloc.dart';
 import 'package:flutter_ui_challenge/model/credit.dart';
 import 'package:flutter_ui_challenge/model/movie_details.dart';
-import 'package:flutter_ui_challenge/model/movie_list.dart';
-// import 'package:flutter_ui_challenge/model/video_details.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
-import 'package:flutter_ui_challenge/respository/movie_respository.dart';
+import 'package:flutter_ui_challenge/model/movie_images.dart';
+import 'package:flutter_ui_challenge/pages/image_slide_screen.dart';
+import 'package:flutter_ui_challenge/repository/constants.dart';
+import 'package:flutter_ui_challenge/repository/movie_repository.dart';
 import 'package:flutter_ui_challenge/widgets/list_row.dart';
 import 'package:flutter_ui_challenge/widgets/movie_cast_list.dart';
 
 class MovieDetailPage extends StatefulWidget {
-  final Results movie;
+  final int id;
+  final FirebaseUser user;
   MovieDetailPage({
     Key key,
-    this.movie,
+    this.id,
+    this.user
   }) : super(key: key);
 
   @override
@@ -45,12 +51,13 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     //   ),
     // );
     // _movieBloc.add(LoadMovieVideosEvent(id: widget.movie.id));
-    _movieBloc.add(LoadMovieDetailsEvent(id: widget.movie.id));
+    _movieBloc.add(LoadMovieDetailsEvent(id: widget.id));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
     Size screenSize = MediaQuery.of(context).size;
 // print(movie.genries);
     return Scaffold(
@@ -58,7 +65,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       body: BlocBuilder<MoviesBloc, MoviesState>(
         bloc: _movieBloc,
         builder: (BuildContext context, state) {
-          if (state is LoadingState) {
+          if (state is MovieLoadingState) {
             return Center(
                 child: SpinKitHourGlass(
               color: Colors.greenAccent,
@@ -69,10 +76,14 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
             var videoDetails = state.videoDetails;
             Credit credit = state.credit;
 
-            var result = videoDetails.results[0];
+            BlocProvider.of<MoviesBloc>(context)
+                .add(GetFavouriteEvent(id: movieDetails.id));
+            var result = videoDetails.results.length > 0
+                ? videoDetails.results[0]
+                : null;
             // print(state.similarMovies);
             _controller = YoutubePlayerController(
-              initialVideoId: '${result.key}',
+              initialVideoId: '${result != null ? result.key : ""}',
               flags: YoutubePlayerFlags(
                 autoPlay: false,
                 mute: false,
@@ -88,13 +99,29 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                   backgroundColor: Colors.black.withOpacity(0.5),
                   elevation: 8,
                   actions: <Widget>[
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.share),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          shape: BoxShape.circle),
+                      child: IconButton(
+                        onPressed: () {
+                          MovieRepository.shareImage(
+                              'Share this movie',
+                              'Hi, from MovieDB,\n I would like you to check this movie out => ${movieDetails.title}\n${movieDetails.homepage}',
+                              movieDetails.posterPath);
+                          // Share.text('Share this movie', 'Hi, from MovieDB,\n I would like you to check this movie out => ${movieDetails.title}\n${movieDetails.homepage}', "text/*");
+                        },
+                        icon: Icon(Icons.share),
+                      ),
                     ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.favorite_border),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          shape: BoxShape.circle),
+                      child: FavouriteWidget(movieDetails: movieDetails),
                     )
                   ],
                   flexibleSpace: FlexibleSpaceBar(
@@ -165,46 +192,76 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Wrap(
-                                    runAlignment: WrapAlignment.start,
-
-                                    direction: Axis.horizontal,
-
-                                    // runSpacing: 0,
-
-                                    spacing: 5,
-
-                                    children: movieDetails.genres
-                                        .map((f) => GestureDetector(
-                                            onTap: () {},
-                                            child: Chip(
-                                              label: Text(f.name),
-                                            )))
-                                        .toList(),
-                                  ),
-
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-
                                   Row(
                                     children: <Widget>[
-                                      Icon(Icons.star, color: Colors.orange),
-                                      SizedBox(
-                                        width: 5,
+                                      Expanded(
+                                        flex: 7,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Wrap(
+                                              runAlignment: WrapAlignment.start,
+
+                                              direction: Axis.horizontal,
+
+                                              // runSpacing: 0,
+
+                                              spacing: 5,
+
+                                              children: movieDetails.genres
+                                                  .map((f) => GestureDetector(
+                                                      onTap: () {},
+                                                      child: Chip(
+                                                        label: Text(f.name),
+                                                      )))
+                                                  .toList(),
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(Icons.star,
+                                                    color: Colors.orange),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(
+                                                    '${movieDetails.voteAverage}'),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Icon(Icons.date_range),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(
+                                                    '${movieDetails.releaseDate}'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      Text('${movieDetails.voteAverage}'),
-                                      SizedBox(
-                                        width: 20,
+                                      CachedNetworkImage(
+                                        imageUrl:
+                                            "${IMAGE_URL + movieDetails.posterPath}",
+                                        fit: BoxFit.cover,
+                                        width: 100,
+                                        height: 130,
+                                        placeholder: (context, url) => Center(
+                                            child: CircularProgressIndicator()),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
                                       ),
-                                      Icon(Icons.date_range),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Text('${movieDetails.releaseDate}'),
                                     ],
                                   ),
-
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  WatchListButton(
+                                    movieDetails: movieDetails,
+                                  ),
                                   SizedBox(
                                     height: 30,
                                   ),
@@ -227,7 +284,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                   ),
 
                                   Text(
-                                    "Trailer: ${result.name}",
+                                    "Trailer: ${result != null ? result.name : "Trailer Unavailable"}",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
@@ -294,7 +351,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
 
   Widget _buildBackdropCarousel(int id) {
     return FutureBuilder(
-      future: new MovieRespository().getMovieImages(id),
+      future: new MovieRepository().getMovieImages(id),
       builder: (BuildContext context, AsyncSnapshot<MovieImages> snapshot) {
         if (snapshot.data != null) {
           List<Backdrop> backdrops = snapshot.data.backdrops;
@@ -303,7 +360,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               items: backdrops
                   .map((backdrop) => _buildBackdropItem(backdrops, backdrop))
                   .toList(),
-              autoPlay: false,
+              autoPlay: true,
+              autoPlayCurve: Curves.fastOutSlowIn,
               onPageChanged: (i) {
                 backdropindex = i;
               },
@@ -332,7 +390,9 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       child: Hero(
         tag: "backdrop",
         child: CachedNetworkImage(
-          imageUrl: "${IMAGE_URL + backdrop.filePath}",
+          imageUrl: backdrop.filePath != null
+              ? "${IMAGE_URL + backdrop.filePath}"
+              : "assets/images/no-image.jpg",
           fit: BoxFit.cover,
           width: MediaQuery.of(context).size.width,
           placeholder: (context, url) =>
@@ -340,6 +400,208 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
           errorWidget: (context, url, error) => Icon(Icons.error),
         ),
       ),
+    );
+  }
+}
+
+class FavouriteWidget extends StatelessWidget {
+  const FavouriteWidget({
+    Key key,
+    @required this.movieDetails,
+  }) : super(key: key);
+
+  final MovieDetails movieDetails;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (BuildContext context, state) {
+        if (state is AuthLoginState) {
+          print("Auth State");
+          FirebaseUser user = state.user;
+          BlocProvider.of<MoviesBloc>(context).add(GetFavouriteEvent(uid: user?.uid,id: movieDetails.id));
+          return BlocBuilder(
+            bloc: BlocProvider.of<MoviesBloc>(context),
+            builder: (BuildContext context, state) {
+              if (state is FavouriteItemState) {
+                return (state.favourite != null)
+                    ? IconButton(
+                        onPressed: () {
+                          if (user != null) {
+                            BlocProvider.of<MoviesBloc>(context).add(
+                                AddFavouritesEvent(
+                                    movieDetails: movieDetails, uid: user.uid));
+                          } else {
+                            showDialog(
+                            useRootNavigator: true,
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: AuthModalForm(),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                              );
+                            });
+                          }
+                        },
+                        icon: Icon(
+                          Icons.favorite,
+                          color: user != null ? Colors.red : Colors.white,
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: () {
+                          if (user != null) {
+                            BlocProvider.of<MoviesBloc>(context).add(
+                                AddFavouritesEvent(
+                                    movieDetails: movieDetails, uid: user.uid));
+                          } else {
+                             showDialog(
+                            useRootNavigator: true,
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: AuthModalForm(),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                              );
+                            });
+                          }
+                        },
+                        icon: Icon(Icons.favorite),
+                      );
+              }
+
+              return IconButton(
+                onPressed: () {
+                  if (user != null) {
+                    BlocProvider.of<MoviesBloc>(context).add(AddFavouritesEvent(
+                        movieDetails: movieDetails, uid: user.uid));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => SignInPage()));
+                  }
+                },
+                icon: Icon(Icons.favorite),
+              );
+            },
+          );
+        }
+
+        return SizedBox.shrink();
+      },
+    );
+  }
+}
+
+class WatchListButton extends StatelessWidget {
+  final MovieDetails movieDetails;
+  const WatchListButton({
+    Key key,
+    this.movieDetails,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+//    MoviesBloc _moviesBloc = BlocProvider.of<MoviesBloc>(context);
+//    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      bloc: BlocProvider.of<AuthBloc>(context),
+      builder: (BuildContext context, AuthState state) {
+        if (state is AuthLoginState) {
+          var user = state.user;
+          BlocProvider.of<MoviesBloc>(context).add(GetWatchListItemEvent(id: movieDetails.id,uid: user?.uid));
+          return BlocBuilder(
+            bloc: BlocProvider.of<MoviesBloc>(context),
+            builder: (BuildContext context, state) {
+              if (state is WatchListItem) {
+                if (state.watchListItem != null) {
+                  return MaterialButton(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    textColor: Theme.of(context).canvasColor,
+                    color: Theme.of(context).accentColor,
+                    onPressed: () {
+                       if (user != null) {
+                         BlocProvider.of<MoviesBloc>(context).add(
+                          DeleteWatchListMovieItem(movieId: movieDetails.id,uid: user.uid));
+                           Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "${movieDetails.title} has been removed from watch list"),
+                      ));
+                          } else {
+                            showDialog(
+                            useRootNavigator: true,
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: AuthModalForm(),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                              );
+                            });
+                          }
+                    
+                    },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.delete),
+                        SizedBox(
+                          width: 16,
+                        ),
+                        Center(child: Text("Remove from Watch List")),
+                      ],
+                    ),
+                  );
+                }
+              }
+
+              return MaterialButton(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                textColor: Theme.of(context).canvasColor,
+                color: Theme.of(context).accentColor,
+                onPressed: () {
+                   if (user != null) {
+                     BlocProvider.of<MoviesBloc>(context)
+                      .add(AddWatchListEvent(movieDetails: movieDetails,uid: user.uid));
+                          } else {
+                            showDialog(
+                            useRootNavigator: true,
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: AuthModalForm(),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3)),
+                              );
+                            });
+                          }
+                 
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.add),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    Center(child: Text("Add to Watch List")),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return SizedBox.shrink();
+      },
     );
   }
 }

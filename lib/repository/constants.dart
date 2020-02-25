@@ -6,6 +6,8 @@ final TMMDB_URL="https://api.themoviedb.org/3/";
 final String IMAGE_URL="https://image.tmdb.org/t/p/w600_and_h900_bestv2";
 final String THEME_PREF_KEY='theme_key';
 
+GlobalKey<ScaffoldState>homeScaffoldKey=GlobalKey<ScaffoldState>();
+
 ThemeData getLightTheme(BuildContext context){
   return Theme.of(context).copyWith(brightness: Brightness.light,primaryColor: Colors.blue,);
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ui_challenge/model/movie.dart';
 import 'package:flutter_ui_challenge/pages/movie_list_page.dart';
-import 'package:flutter_ui_challenge/respository/movie_respository.dart';
+import 'package:flutter_ui_challenge/repository/movie_repository.dart';
 
 class SearchWidget extends SearchDelegate<Movie> {
 
@@ -38,7 +38,7 @@ class SearchWidget extends SearchDelegate<Movie> {
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder(
-        future: new MovieRespository().searchMovie(query),
+        future: new MovieRepository().searchMovie(query),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
 
           if (snapshot.data == null) {

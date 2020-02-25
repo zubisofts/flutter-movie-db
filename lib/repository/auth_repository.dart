@@ -1,14 +1,24 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_ui_challenge/model/user.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class AuthRespository {  
-  
+class AuthRepository {
   FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userReference =
       Firestore.instance.collection("flutter_ui_challenge");
 
-  User _userFromFirebaseUser(FirebaseUser firebaseUser) {
+     GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        // 'https://www.googleapis.com/auth/contacts.readonly',
+      ],
+    );
+
+  User userFromFirebaseUser(FirebaseUser firebaseUser) {
     return User(
         id: firebaseUser.uid,
         email: firebaseUser.email,
@@ -23,12 +33,40 @@ class AuthRespository {
       if (user == null) {
         return null;
       } else {
-        print("You are looged in successfully...");
-        return _userFromFirebaseUser(user);
+        // print("You are looged in successfully...");
+        return userFromFirebaseUser(user);
       }
     } catch (ex) {
       return ex.message;
       // print(ex.message);
+    }
+  }
+
+  Future<dynamic> loginUserWithCredentials({BuildContext context}) async {
+
+     try {
+      var googleSignInAccount = await _googleSignIn.signIn();
+      if(googleSignInAccount!=null){
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+       AuthResult result = await _auth.signInWithCredential(credential);
+      FirebaseUser user = result.user;
+      if (user == null) {
+        return null;
+      } else {
+        // print("You are looged in successfully...");
+        return user;
+      }
+      }
+      
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -41,7 +79,7 @@ class AuthRespository {
       if (user == null) {
         return null;
       } else {
-        print("You have been registered successfully...");
+        // print("You have been registered successfully...");
         var savedUser = _saveUserToDatabase(User(
             id: user.uid,
             email: email,
@@ -49,11 +87,11 @@ class AuthRespository {
             lastname: lname,
             avatarUrl: user.photoUrl != null ? user.photoUrl : ""));
 
-            if(savedUser==null){
-              return null;
-            }
+        if (savedUser == null) {
+          return null;
+        }
 
-            return User(
+        return User(
             id: user.uid,
             email: email,
             firstname: fname,
@@ -66,8 +104,7 @@ class AuthRespository {
     }
   }
 
-  Future<dynamic> _saveUserToDatabase(User user) async{
-
+  Future<dynamic> _saveUserToDatabase(User user) async {
     return await userReference.document("data").collection("users").add({
       "id": user.id,
       "email": user.email,
@@ -76,5 +113,20 @@ class AuthRespository {
       "avatarUrl": user.avatarUrl
     });
     // .whenComplete(()=>"").catchError((doc)=>doc.message);
+  }
+
+  Stream<FirebaseUser> listenToSignIn() {
+    return _auth.onAuthStateChanged;
+  }
+
+  Future<void> logout() async {
+    try {
+      if(_googleSignIn!=null){
+        _googleSignIn.disconnect();
+      }
+      return _auth.signOut();
+    } catch (ex) {
+      print(ex);
+    }
   }
 }

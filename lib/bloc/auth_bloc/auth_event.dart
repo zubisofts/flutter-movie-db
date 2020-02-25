@@ -1,13 +1,23 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
 }
 
 class LoginEvent extends AuthEvent {
+ 
   @override
   List<Object> get props => [];
 }
+
+class GoogleLoginEvent extends AuthEvent {
+ 
+  @override
+  List<Object> get props => [];
+}
+
 
 class Logout extends AuthEvent {
   @override
@@ -15,8 +25,29 @@ class Logout extends AuthEvent {
 }
 
 class RegisterEvent extends AuthEvent {
+
   @override
   List<Object> get props => [];
+}
+
+class ListenToLoginEvent extends AuthEvent{
+
+  @override
+  List<Object> get props => [];
+  
+}
+
+
+class AuthStateChangedEvent extends AuthEvent {
+
+  final FirebaseUser user;
+  AuthStateChangedEvent({
+    this.user,
+  });
+
+  @override
+  List<Object> get props => [user];
+  
 }
 
 class OnEmailChangeEvent extends AuthEvent {
@@ -50,4 +81,10 @@ class OnRegDetailsChangedEvent extends AuthEvent {
 
   @override
   List<Object> get props => [firstname,lastname,email,password,confirmPassword];
+}
+
+class LogoutEvent extends AuthEvent{
+  @override
+  List<Object> get props => [];
+  
 }

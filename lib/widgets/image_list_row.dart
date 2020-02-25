@@ -3,36 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
 import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
+import 'package:flutter_ui_challenge/repository/constants.dart';
 
-class ImageList extends StatefulWidget {
-  final int id;
+// class ImageList extends StatefulWidget {
+//   final int id;
 
-  ImageList({Key key, this.id}) : super(key: key);
+//   ImageList({Key key, this.id}) : super(key: key);
 
-  @override
-  _ImageListState createState() => _ImageListState();
-}
+//   @override
+//   _ImageListState createState() => _ImageListState();
+// }
 
-class _ImageListState extends State<ImageList> {
+class ImageList extends StatelessWidget {
+
+final int id;
+  ImageList({this.id});
   MoviesBloc _moviesBloc = MoviesBloc();
 
   @override
-  void initState() {
-    print("Person id:${widget.id}");
-    super.initState();
-    _moviesBloc.add(GetPersonImagesEvent(id: widget.id));
-  }
-
-  @override
   Widget build(BuildContext context) {
+    _moviesBloc.add(GetPersonImagesEvent(id: id));
     return Container(
       height: 150,
       // width: 200,
       child: BlocBuilder<MoviesBloc, MoviesState>(
         bloc: _moviesBloc,
         builder: (BuildContext context, MoviesState state) {
-          if (state is LoadingState) {
+          if (state is MovieLoadingState) {
             return Center(child: CircularProgressIndicator());
           }
           if (state is PersonImagesState) {
@@ -61,7 +58,7 @@ class _ImageListState extends State<ImageList> {
                   RaisedButton(
                     child: Text("Retry"),
                     onPressed: () =>
-                        _moviesBloc.add(GetPersonImagesEvent(id: widget.id)),
+                        _moviesBloc.add(GetPersonImagesEvent(id: id)),
                   )
                 ],
               ));
@@ -76,7 +73,7 @@ class _ImageListState extends State<ImageList> {
               RaisedButton(
                 child: Text("Retry"),
                 onPressed: () =>
-                    _moviesBloc.add(GetPersonImagesEvent(id: widget.id)),
+                    _moviesBloc.add(GetPersonImagesEvent(id: id)),
               )
             ],
           ));

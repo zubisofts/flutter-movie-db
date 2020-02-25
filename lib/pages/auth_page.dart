@@ -117,10 +117,10 @@ class _AuthPageState extends State<AuthPage> {
 }
 
 class ListItem extends StatelessWidget {
-  String title;
-  String subTitle;
-  Color iconColor;
-  IconData icon;
+  final String title;
+  final String subTitle;
+  final Color iconColor;
+  final IconData icon;
   ListItem({
     Key key,
     this.title,

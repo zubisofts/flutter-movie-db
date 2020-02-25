@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_ui_challenge/model/credit.dart';
+import 'package:flutter_ui_challenge/model/favourite.dart';
 import 'package:flutter_ui_challenge/model/movie_details.dart';
 import 'package:flutter_ui_challenge/model/movie_list.dart';
 import 'package:flutter_ui_challenge/model/person.dart';
@@ -15,7 +16,7 @@ class InitialMoviesState extends MoviesState {
   List<Object> get props => [];
 }
 
-class LoadingState extends MoviesState {
+class MovieLoadingState extends MoviesState {
   @override
   List<Object> get props => [];
 }
@@ -85,4 +86,75 @@ class PersonImagesState extends MoviesState {
 
   @override
   List<Object> get props => [images];
+}
+
+class FavouritesState extends MoviesState {
+  final List<Favourite> favourites;
+  FavouritesState({
+    this.favourites,
+  });
+
+  @override
+  List<Object> get props => [favourites];
+}
+
+class FavouriteItemState extends MoviesState {
+  final Favourite favourite;
+  FavouriteItemState({
+    this.favourite,
+  });
+
+  @override
+  List<Object> get props => [favourite];
+}
+
+
+class FavouriteMoviesLoaded extends MoviesState {
+  final List<MovieDetails> favourites;
+  FavouriteMoviesLoaded({
+    this.favourites,
+  });
+
+  @override
+  List<Object> get props => [favourites];
+}
+
+
+
+// class WatchListState extends MoviesState {
+//   final List<MovieDetails> watchList;
+//   WatchListState({
+//     this.watchList,
+//   });
+
+//   @override
+//   List<Object> get props => [watchList];
+// }
+
+class WatchListItem extends MoviesState {
+  final MovieDetails watchListItem;
+  WatchListItem({
+    this.watchListItem,
+  });
+
+  @override
+  List<Object> get props => [watchListItem];
+}
+
+
+class WatchListMoviesLoaded extends MoviesState {
+  final List<MovieDetails> watchList;
+  WatchListMoviesLoaded({
+    this.watchList,
+  });
+
+  @override
+  List<Object> get props => [watchList];
+}
+
+
+class MovieErrorState extends MoviesState {
+
+  @override
+  List<Object> get props => [];
 }

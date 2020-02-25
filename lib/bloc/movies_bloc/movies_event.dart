@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:flutter_ui_challenge/respository/movie_respository.dart';
+import 'package:flutter_ui_challenge/model/favourite.dart';
+import 'package:flutter_ui_challenge/model/movie_details.dart';
+import 'package:flutter_ui_challenge/repository/movie_repository.dart';
 
 abstract class MoviesEvent extends Equatable {
   const MoviesEvent();
@@ -71,4 +73,134 @@ class GetPersonImagesEvent extends MoviesEvent {
 
   @override
   List<Object> get props => [id];
+}
+
+
+class AddFavouritesEvent extends MoviesEvent {
+  final MovieDetails movieDetails;
+  final String uid;
+  AddFavouritesEvent({
+    this.movieDetails,
+    this.uid
+  });
+
+  @override
+  List<Object> get props => [movieDetails];
+}
+
+class GetFavouriteEvent extends MoviesEvent {
+  final int id;
+  final String uid;
+  GetFavouriteEvent({
+    this.id,
+    this.uid
+  });
+
+  @override
+  List<Object> get props => [id];
+}
+class GetFavouriteMovieEvent extends MoviesEvent {
+  final Favourite favourite;
+  GetFavouriteMovieEvent({
+    this.favourite,
+  });
+
+  @override
+  List<Object> get props => [favourite];
+}
+
+class LoadFavouriteMoviesEvent extends MoviesEvent {
+  final String uid;
+  LoadFavouriteMoviesEvent({
+    this.uid,
+  });
+
+  @override
+  List<Object> get props => [uid];
+}
+
+class LoadAllFavouritesMovieEvent extends MoviesEvent {
+  final List<MovieDetails> favourites;
+  LoadAllFavouritesMovieEvent({
+    this.favourites,
+  });
+
+  @override
+  List<Object> get props => [favourites];
+}
+
+
+class AddWatchListEvent extends MoviesEvent {
+  final MovieDetails movieDetails;
+  final String uid;
+  AddWatchListEvent({
+    this.movieDetails,
+    this.uid
+  });
+
+  @override
+  List<Object> get props => [movieDetails,uid];
+}
+
+class GetWatchListItemEvent extends MoviesEvent {
+  final int id;
+  final String uid;
+  GetWatchListItemEvent({
+    this.id,
+    this.uid
+  });
+
+  @override
+  List<Object> get props => [id];
+}
+class GetWatchListMovieEvent extends MoviesEvent {
+  final MovieDetails watchListItem;
+  GetWatchListMovieEvent({
+    this.watchListItem,
+  });
+
+  @override
+  List<Object> get props => [watchListItem];
+}
+
+class LoadWatchListMoviesEvent extends MoviesEvent {
+  final String uid;
+  LoadWatchListMoviesEvent({
+    this.uid,
+  });
+
+  @override
+  List<Object> get props => [uid];
+}
+
+class LoadAllWatchListMovieEvent extends MoviesEvent {
+  final List<MovieDetails> watchLists;
+  LoadAllWatchListMovieEvent({
+    this.watchLists,
+  });
+
+  @override
+  List<Object> get props => [watchLists];
+}
+
+class DeleteFavouriteMovieItem extends MoviesEvent {
+  final int movieId;
+  DeleteFavouriteMovieItem({
+    this.movieId,
+  });
+  @override
+  List<Object> get props => [movieId];
+
+}
+
+class DeleteWatchListMovieItem extends MoviesEvent {
+  final int movieId;
+  final String uid;
+  DeleteWatchListMovieItem({
+    this.movieId,
+    this.uid
+  });
+  @override
+  List<Object> get props => [movieId];
+
 }

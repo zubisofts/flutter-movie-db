@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
 import 'package:flutter_ui_challenge/pages/home.dart';
@@ -12,10 +13,10 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  AuthBloc _authBloc = AuthBloc();
-
   @override
   Widget build(BuildContext context) {
+    AuthBloc _authBloc = BlocProvider.of<AuthBloc>(context);
+    _authBloc.add(ListenToLoginEvent());
     return Scaffold(
       body: ListView(
         children: <Widget>[
@@ -80,8 +81,19 @@ class _SignInPageState extends State<SignInPage> {
                         bloc: _authBloc,
                         listener: (BuildContext context, state) {
                           if (state is LoggedInState) {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) => Home()));
+                            // print("Loggend in");
+                            Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) => Home()));
+                            // if (!Navigator.canPop(context)) {
+                            //   SystemNavigator.pop();
+                            // }
+                            // _authBloc.add(ListenToLoginEvent());
+                          }
+                          if (state is AuthLoginState) {
+                            if (state.user != null) {
+                              print("Loggend in ${state.user.email}");
+                            }
                           }
                         },
                         child: BlocBuilder<AuthBloc, AuthState>(
@@ -99,7 +111,7 @@ class _SignInPageState extends State<SignInPage> {
                               return SizedBox.shrink();
                             }
 
-                            if (state is ErrorState) {
+                            if (state is AuthErrorState) {
                               return Center(
                                   child: Text(
                                 "${state.error}",
@@ -119,7 +131,7 @@ class _SignInPageState extends State<SignInPage> {
                       BlocBuilder(
                         bloc: _authBloc,
                         builder: (BuildContext context, state) {
-                          if (state is LoadingState) {
+                          if (state is AuthLoadingState) {
                             return LoadingButton(
                               text: "Signing in...",
                             );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ui_challenge/model/credit.dart';
+import 'package:flutter_ui_challenge/pages/movie_credits_page.dart';
 import 'package:flutter_ui_challenge/widgets/movie_cast_item.dart';
 
 class MovieCastList extends StatefulWidget {
@@ -23,47 +24,68 @@ class _MovieCastList extends State<MovieCastList> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 240,
-      // width: 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  widget.title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                Text(
-                  "View All",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.greenAccent),
-                ),
-              ],
+    return Card(
+      margin: EdgeInsets.only(top: 8),
+      elevation: 5,
+      color: Theme.of(context).canvasColor,
+          child: Container(
+            margin: EdgeInsets.only(top: 8),
+        height: 240,
+        // width: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    widget.title,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => MovieCreditsPage(
+                              credit: widget.credit,
+                            ))),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).accentColor.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(16.0)),
+                      child: Center(
+                        child: Text(
+                          "View All",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Theme.of(context).accentColor),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-              child: ListView.builder(
-            physics: BouncingScrollPhysics(),
-            itemCount: widget.credit.cast.length,
-            // shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (BuildContext context, int index) {
-              // print(movies[index].title);
-              // Movie movie=movies[index];
-              var cast=widget.credit.cast;
-              return MovieCastItem(
-                cast: cast[index],
-              );
-            },
-          )),
-        ],
+            Expanded(
+              
+                child:widget.credit.cast!=null ? ListView.builder(
+              physics: BouncingScrollPhysics(),
+              itemCount: widget.credit.cast.length,
+              // shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                // print(movies[index].title);
+                // Movie movie=movies[index];
+                var cast = widget.credit.cast;
+                return MovieCastItem(
+                  cast: cast[index],
+                );
+              },
+            ):SizedBox.shrink()),
+          ],
+        ),
       ),
     );
   }

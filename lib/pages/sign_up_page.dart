@@ -175,7 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               return SizedBox.shrink();
                             }
 
-                            if (state is ErrorState) {
+                            if (state is AuthErrorState) {
                               return Center(
                                   child: Text(
                                 "${state.error}",
@@ -195,7 +195,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       BlocBuilder(
                         bloc: _authBloc,
                         builder: (BuildContext context, state) {
-                          if (state is LoadingState) {
+                          if (state is AuthLoadingState) {
                             return LoadingButton(
                               text: "Creating Account...",
                             );
@@ -209,7 +209,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 decoration: BoxDecoration(color: Colors.blue),
                                 child: Center(
                                   child: Text(
-                                    "Sign In",
+                                    "Create Account",
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500),

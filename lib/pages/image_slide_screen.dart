@@ -1,15 +1,14 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ui_challenge/repository/movie_repository.dart';
 import 'package:getflutter/components/carousel/gf_carousel.dart';
 
 import 'package:flutter_ui_challenge/model/movie_images.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
+import 'package:flutter_ui_challenge/repository/constants.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class ImageSlideScreen extends StatefulWidget {
@@ -27,11 +26,11 @@ class ImageSlideScreen extends StatefulWidget {
 }
 
 class _ImageSlideScreenState extends State<ImageSlideScreen> {
-  String _message = "";
+//  String _message = "";
   String _path = "";
-  String _size = "";
+//  String _size = "";
   String _mimeType = "";
-  File _imageFile;
+//  File _imageFile;
   int _progress = 0;
 
   @override
@@ -77,7 +76,7 @@ class _ImageSlideScreenState extends State<ImageSlideScreen> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          _shareImage('Share this image', "image.jpg");
+                         MovieRepository.shareImage('Share this image', "image.jpg",widget.backdrops[widget.index].filePath);
                         },
                         child: IconButtonEx(
                           icon: Icons.share,
@@ -108,26 +107,29 @@ class _ImageSlideScreenState extends State<ImageSlideScreen> {
               ),
             ),
             Expanded(
-              child: GFCarousel(
-                height: MediaQuery.of(context).size.height,
-                items: widget.backdrops
-                    .map((backdrop) => _buildBackdropItem(backdrop))
-                    .toList(),
-                autoPlay: false,
-                initialPage: widget.index,
-                // aspectRatio: 1.0,
-                scrollPhysics: BouncingScrollPhysics(),
-                enlargeMainPage: false,
-                viewportFraction: 1.0,
-                onPageChanged: (page) {
-                  setState(() {
-                    widget.index = page;
-                  });
-                  
-                },
-                pagination: true,
-                activeIndicator: Colors.orange,
-                passiveIndicator: Theme.of(context).accentColor,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32.0),
+                child: GFCarousel(
+                  height: MediaQuery.of(context).size.height,
+                  items: widget.backdrops
+                      .map((backdrop) => _buildBackdropItem(backdrop))
+                      .toList(),
+                  autoPlay: false,
+                  initialPage: widget.index,
+                  // aspectRatio: 1.0,
+                  scrollPhysics: BouncingScrollPhysics(),
+                  enlargeMainPage: false,
+                  viewportFraction: 1.0,
+                  onPageChanged: (page) {
+                    setState(() {
+                      widget.index = page;
+                    });
+
+                  },
+                  // pagination: true,
+                  // activeIndicator: Colors.orange,
+                  // passiveIndicator: Theme.of(context).accentColor,
+                ),
               ),
             ),
           ],
@@ -201,6 +203,7 @@ class _ImageSlideScreenState extends State<ImageSlideScreen> {
       size = await ImageDownloader.findByteSize(imageId);
       mimeType = await ImageDownloader.findMimeType(imageId);
     } on PlatformException catch (error) {
+      print(error);
       // setState(() {
       //   _message = error.message;
       // });
@@ -211,24 +214,15 @@ class _ImageSlideScreenState extends State<ImageSlideScreen> {
 
     setState(() {
       var location = Platform.isAndroid ? "Directory" : "Photo Library";
-      _message = 'Saved as "$fileName" in $location.\n';
-      _size = 'size:     $size';
+//      _message = 'Saved as "$fileName" in $location.\n';
+//      _size = 'size:     $size';
       _mimeType = 'mimeType: $mimeType';
       _path = path;
       // Scaffold.of(cxt).showSnackBar(SnackBar(content: Text("data"),duration: Duration(seconds: 3),));
       if (!_mimeType.contains("video")) {
-        _imageFile = File(path);
+//        _imageFile = File(path);
       }
     });
-  }
-
-  Future<void> _shareImage(String title, String name) async {
-    var request = await HttpClient()
-        .getUrl(Uri.parse(IMAGE_URL + widget.backdrops[widget.index].filePath));
-    var response = await request.close();
-    Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-    await Share.file(title, name, bytes, 'image/jpg');
-    // Share.text(title,"hdfjhil","text");
   }
 }
 
@@ -253,13 +247,13 @@ class IconButtonEx extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            offset: Offset(0, 0),
-            blurRadius: 10,
-          )
-        ],
+        color: Colors.black.withOpacity(0.5),
+//        boxShadow: [
+//          BoxShadow(
+//            offset: Offset(0, 0),
+//            blurRadius: 10,
+//          )
+//        ],
       ),
     );
   }
