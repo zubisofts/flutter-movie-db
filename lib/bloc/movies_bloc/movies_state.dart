@@ -1,11 +1,13 @@
+import 'package:MovieDB/model/movie_review.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_ui_challenge/model/credit.dart';
-import 'package:flutter_ui_challenge/model/favourite.dart';
-import 'package:flutter_ui_challenge/model/movie_details.dart';
-import 'package:flutter_ui_challenge/model/movie_list.dart';
-import 'package:flutter_ui_challenge/model/person.dart';
-import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/model/video_details.dart';
+import 'package:MovieDB/model/credit.dart';
+import 'package:MovieDB/model/favourite.dart';
+import 'package:MovieDB/model/movie_details.dart';
+import 'package:MovieDB/model/movie_list.dart';
+import 'package:MovieDB/model/person.dart';
+import 'package:MovieDB/model/person_images.dart';
+import 'package:MovieDB/model/video_details.dart';
+import 'package:flutter/material.dart';
 
 abstract class MoviesState extends Equatable {
   const MoviesState();
@@ -21,8 +23,14 @@ class MovieLoadingState extends MoviesState {
   List<Object> get props => [];
 }
 
+class LoadingState extends MoviesState {
+  @override
+  List<Object> get props => [];
+}
+
 class MoviesLoadedState extends MoviesState {
   final MovieList movies;
+
   MoviesLoadedState({
     this.movies,
   });
@@ -33,6 +41,7 @@ class MoviesLoadedState extends MoviesState {
 
 class MoreMoviesLoadedState extends MoviesState {
   final MovieList movies;
+
   MoreMoviesLoadedState({
     this.movies,
   });
@@ -55,11 +64,12 @@ class MovieDetailsReadyState extends MoviesState {
   });
 
   @override
-  List<Object> get props => [movieDetails,videoDetails,similarMovies];
+  List<Object> get props => [movieDetails, videoDetails, similarMovies];
 }
 
 class MovieVideosReadyState extends MoviesState {
   final VideoDetails videoDetails;
+
   MovieVideosReadyState({
     this.videoDetails,
   });
@@ -70,6 +80,7 @@ class MovieVideosReadyState extends MoviesState {
 
 class PersonDetialsState extends MoviesState {
   final Person person;
+
   PersonDetialsState({
     this.person,
   });
@@ -80,6 +91,7 @@ class PersonDetialsState extends MoviesState {
 
 class PersonImagesState extends MoviesState {
   final PersonImages images;
+
   PersonImagesState({
     this.images,
   });
@@ -90,6 +102,7 @@ class PersonImagesState extends MoviesState {
 
 class FavouritesState extends MoviesState {
   final List<Favourite> favourites;
+
   FavouritesState({
     this.favourites,
   });
@@ -99,7 +112,8 @@ class FavouritesState extends MoviesState {
 }
 
 class FavouriteItemState extends MoviesState {
-  final Favourite favourite;
+  final MovieDetails favourite;
+
   FavouriteItemState({
     this.favourite,
   });
@@ -108,9 +122,9 @@ class FavouriteItemState extends MoviesState {
   List<Object> get props => [favourite];
 }
 
-
 class FavouriteMoviesLoaded extends MoviesState {
   final List<MovieDetails> favourites;
+
   FavouriteMoviesLoaded({
     this.favourites,
   });
@@ -118,8 +132,6 @@ class FavouriteMoviesLoaded extends MoviesState {
   @override
   List<Object> get props => [favourites];
 }
-
-
 
 // class WatchListState extends MoviesState {
 //   final List<MovieDetails> watchList;
@@ -133,6 +145,7 @@ class FavouriteMoviesLoaded extends MoviesState {
 
 class WatchListItem extends MoviesState {
   final MovieDetails watchListItem;
+
   WatchListItem({
     this.watchListItem,
   });
@@ -141,9 +154,9 @@ class WatchListItem extends MoviesState {
   List<Object> get props => [watchListItem];
 }
 
-
 class WatchListMoviesLoaded extends MoviesState {
   final List<MovieDetails> watchList;
+
   WatchListMoviesLoaded({
     this.watchList,
   });
@@ -152,9 +165,16 @@ class WatchListMoviesLoaded extends MoviesState {
   List<Object> get props => [watchList];
 }
 
-
 class MovieErrorState extends MoviesState {
-
   @override
   List<Object> get props => [];
+}
+
+class MovieReviewsLoaded extends MoviesState {
+  final MovieReview movieReview;
+
+  MovieReviewsLoaded({@required this.movieReview});
+
+  @override
+  List<Object> get props => [movieReview];
 }

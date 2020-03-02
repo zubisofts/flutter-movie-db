@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_state.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
 
-import 'package:flutter_ui_challenge/model/user.dart';
+import 'package:MovieDB/model/user.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();

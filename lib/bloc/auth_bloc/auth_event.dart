@@ -18,6 +18,11 @@ class GoogleLoginEvent extends AuthEvent {
   List<Object> get props => [];
 }
 
+class FacebookLoginEvent extends AuthEvent {
+
+  @override
+  List<Object> get props => [];
+}
 
 class Logout extends AuthEvent {
   @override

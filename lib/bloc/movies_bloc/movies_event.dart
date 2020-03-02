@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:flutter_ui_challenge/model/favourite.dart';
-import 'package:flutter_ui_challenge/model/movie_details.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
+import 'package:MovieDB/model/movie_details.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
 
 abstract class MoviesEvent extends Equatable {
   const MoviesEvent();
@@ -100,7 +99,7 @@ class GetFavouriteEvent extends MoviesEvent {
   List<Object> get props => [id];
 }
 class GetFavouriteMovieEvent extends MoviesEvent {
-  final Favourite favourite;
+  final MovieDetails favourite;
   GetFavouriteMovieEvent({
     this.favourite,
   });
@@ -185,8 +184,10 @@ class LoadAllWatchListMovieEvent extends MoviesEvent {
 
 class DeleteFavouriteMovieItem extends MoviesEvent {
   final int movieId;
+  final String uid;
   DeleteFavouriteMovieItem({
     this.movieId,
+    this.uid,
   });
   @override
   List<Object> get props => [movieId];
@@ -199,6 +200,16 @@ class DeleteWatchListMovieItem extends MoviesEvent {
   DeleteWatchListMovieItem({
     this.movieId,
     this.uid
+  });
+  @override
+  List<Object> get props => [movieId];
+
+}
+
+class GetMovieReviews extends MoviesEvent {
+  final int movieId;
+  GetMovieReviews({
+    this.movieId,
   });
   @override
   List<Object> get props => [movieId];

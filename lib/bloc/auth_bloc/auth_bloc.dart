@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:flutter_ui_challenge/model/user.dart';
-import 'package:flutter_ui_challenge/repository/auth_repository.dart';
+import 'package:MovieDB/model/user.dart';
+import 'package:MovieDB/repository/auth_repository.dart';
 import './bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -27,6 +27,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (event is GoogleLoginEvent) {
       yield* _mapGoogleLoggedState();
+    }
+
+    if (event is FacebookLoginEvent) {
+      yield* _mapFacebookLoggedState();
     }
 
     if (event is OnEmailChangeEvent) {
@@ -118,6 +122,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     yield AuthLoadingState();
 
     dynamic user = await respository.loginUserWithCredentials();
+
+    if (user is String) {
+      yield AuthErrorState(error: user);
+    } else {
+      yield LoggedInState(user: user);
+      add(AuthStateChangedEvent(user: user));
+    }
+ }
+
+ Stream<AuthState> _mapFacebookLoggedState() async*{
+    yield AuthLoadingState();
+
+    dynamic user = await respository.loginUserWithFBCredentials();
 
     if (user is String) {
       yield AuthErrorState(error: user);

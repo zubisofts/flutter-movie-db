@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:MovieDB/model/movie_review.dart';
 import 'package:bloc/bloc.dart';
-import 'package:flutter_ui_challenge/model/favourite.dart';
-import 'package:flutter_ui_challenge/model/movie_details.dart';
-import 'package:flutter_ui_challenge/model/person.dart';
-import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
+import 'package:MovieDB/model/movie_details.dart';
+import 'package:MovieDB/model/person.dart';
+import 'package:MovieDB/model/person_images.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
 import './bloc.dart';
 
 class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
@@ -40,11 +40,11 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
     }
 
     if (event is AddFavouritesEvent) {
-      yield* _mapAddFavouriteEventToState(event.movieDetails,event.uid);
+      yield* _mapAddFavouriteEventToState(event.movieDetails, event.uid);
     }
 
     if (event is GetFavouriteEvent) {
-      yield* _mapFavouriteEventToState(event.id);
+      yield* _mapFavouriteEventToState(event.id, event.uid);
     }
 
     if (event is GetFavouriteMovieEvent) {
@@ -60,15 +60,15 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
     }
 
     if (event is DeleteFavouriteMovieItem) {
-      yield* _mapDeleteFavouriteMovieState(event.movieId);
+      yield* _mapDeleteFavouriteMovieState(event.movieId, event.uid);
     }
 
     if (event is AddWatchListEvent) {
-      yield* _mapAddWatchListItemEventToState(event.movieDetails,event.uid);
+      yield* _mapAddWatchListItemEventToState(event.movieDetails, event.uid);
     }
 
     if (event is GetWatchListItemEvent) {
-      yield* _mapWatchListItemEventEventToState(event.id,event.uid);
+      yield* _mapWatchListItemEventEventToState(event.id, event.uid);
     }
 
     if (event is LoadWatchListMoviesEvent) {
@@ -84,7 +84,11 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
     }
 
     if (event is DeleteWatchListMovieItem) {
-      yield* _mapDeleteWatchListMovieState(event.movieId,event.uid);
+      yield* _mapDeleteWatchListMovieState(event.movieId, event.uid);
+    }
+
+    if (event is GetMovieReviews) {
+      yield* _mapMovieReviewToState(event.movieId);
     }
   }
 
@@ -141,26 +145,26 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
     yield PersonImagesState(images: images);
   }
 
-  Stream<MoviesState> _mapFavouriteEventToState(int id) async* {
+  Stream<MoviesState> _mapFavouriteEventToState(int id, String uid) async* {
     // if (_movieDbSubscription != null) {
     _movieDbSubscription?.cancel();
     // }
 
-    _movieDbSubscription =
-        MovieRepository.withUID("L74vA8gCachsD2WZvRDpBoVR2A42")
-            .getFavourite(id)
-            .listen((fav) => add(GetFavouriteMovieEvent(favourite: fav)));
+    _movieDbSubscription = MovieRepository.withUID(uid)
+        .getFavourite(id)
+        .listen((fav) => add(GetFavouriteMovieEvent(favourite: fav)));
   }
 
-  Stream<MoviesState> _mapGetFavouriteMovieState(Favourite favourite) async* {
+  Stream<MoviesState> _mapGetFavouriteMovieState(
+      MovieDetails favourite) async* {
     yield FavouriteItemState(favourite: favourite);
   }
 
   Stream<MoviesState> _mapAddFavouriteEventToState(
       MovieDetails movieDetails, String uid) async* {
-    MovieRepository.withUID(uid)
-        .addToFavorites(movieDetails);
-    add(GetFavouriteEvent(id: movieDetails.id));
+    MovieRepository.withUID(uid).addToFavorites(movieDetails).then(
+        (onValue) => add(GetFavouriteEvent(id: movieDetails.id, uid: uid)));
+    ;
   }
 
   Stream<MoviesState> _mapLoadFavouriteMoviesState(String uid) async* {
@@ -176,28 +180,27 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
     if (favourites != null) yield FavouriteMoviesLoaded(favourites: favourites);
   }
 
-  Stream<MoviesState> _mapDeleteFavouriteMovieState(int movieId) async* {
-    await MovieRepository.withUID("L74vA8gCachsD2WZvRDpBoVR2A42")
-        .removeFavoritesItem(movieId);
+  Stream<MoviesState> _mapDeleteFavouriteMovieState(
+      int movieId, String uid) async* {
+    await MovieRepository.withUID(uid).removeFavoritesItem(movieId);
 
-    add(LoadFavouriteMoviesEvent(uid: "L74vA8gCachsD2WZvRDpBoVR2A42"));
+    add(LoadFavouriteMoviesEvent(uid: uid));
   }
 
   // Event mappings for watchlist
   Stream<MoviesState> _mapAddWatchListItemEventToState(
       MovieDetails movieDetails, String uid) async* {
-    await MovieRepository.withUID(uid)
-        .addToWatchList(movieDetails);
-    add(GetWatchListItemEvent(id: movieDetails.id,uid: uid));
+    await MovieRepository.withUID(uid).addToWatchList(movieDetails);
+    add(GetWatchListItemEvent(id: movieDetails.id, uid: uid));
   }
 
-  Stream<MoviesState> _mapWatchListItemEventEventToState(int id, String uid) async* {
+  Stream<MoviesState> _mapWatchListItemEventEventToState(
+      int id, String uid) async* {
     // if (_movieDbSubscription != null) {
     _movieDbSubscription?.cancel();
     // }
 
-    _movieDbSubscription = MovieRepository.withUID(
-            uid)
+    _movieDbSubscription = MovieRepository.withUID(uid)
         .getWatchListItem(id)
         .listen((movie) => add(GetWatchListMovieEvent(watchListItem: movie)));
   }
@@ -216,9 +219,9 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
             add(LoadAllWatchListMovieEvent(watchLists: watchLists)));
   }
 
-  Stream<MoviesState> _mapDeleteWatchListMovieState(int movieId, String uid) async* {
-    await MovieRepository.withUID(uid)
-        .removeWatchListItem(movieId);
+  Stream<MoviesState> _mapDeleteWatchListMovieState(
+      int movieId, String uid) async* {
+    await MovieRepository.withUID(uid).removeWatchListItem(movieId);
 
     add(LoadWatchListMoviesEvent(uid: uid));
   }
@@ -232,5 +235,12 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
   Stream<MoviesState> _mapLoadAllWatchList(
       List<MovieDetails> watchLists) async* {
     yield WatchListMoviesLoaded(watchList: watchLists);
+  }
+
+  Stream<MoviesState> _mapMovieReviewToState(int movieId) async* {
+   yield LoadingState();
+    MovieReview movieReview=await movieRespository.getMovieReviews(movieId);
+    yield MovieReviewsLoaded(movieReview: movieReview);
+
   }
 }
