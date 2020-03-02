@@ -1,4 +1,4 @@
-# flutter_ui_challenge
+# A flutter Movie App (MovieDB) using TMDB API
 
 A new Flutter project.
 
