@@ -1,32 +1,44 @@
+import 'package:MovieDB/bloc/auth_bloc/auth_bloc.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
+import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
+import 'package:MovieDB/pages/movie_list_page.dart';
+import 'package:MovieDB/pages/tv_list_page.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
+import 'package:MovieDB/repository/tv_series_repository.dart';
+import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/auth_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_event.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_state.dart';
-import 'package:flutter_ui_challenge/pages/movie_list_page.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
-import 'package:flutter_ui_challenge/widgets/movie_item_horizontal.dart';
 
-class ListRow extends StatelessWidget {
+import 'tv_item_horizontal.dart';
+class TvListRow extends StatefulWidget {
   final String title;
-  final MovieCat type;
+  final TvCat type;
   final int id;
   final FirebaseUser user;
 
-  ListRow({Key key, this.title, this.type, this.id,this.user}) : super(key: key);
+  TvListRow({Key key, this.title, this.type, this.id,this.user}) : super(key: key);
 
-  MoviesBloc _moviesBloc = MoviesBloc();
+  @override
+  _TvListRowState createState() => _TvListRowState();
+}
+
+class _TvListRowState extends State<TvListRow> {
+  TvBloc _tvBloc = TvBloc();
+  @override
+  void initState() {
+    _tvBloc.add(LoadTvEvent(
+      type: widget.type,
+      id: widget.id,
+    ));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    _moviesBloc.add(LoadMoviesEvent(
-      type: type,
-      id: id,
-    ));
 
     return Card(
       margin: EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -54,18 +66,18 @@ class ListRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    title,
+                    widget.title,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => MoviesListPage(
-                                title: title,
-                                id: id,
-                                user:user,
-                                type: type,
-                              )));
+                          builder: (BuildContext context) => TvListPage(
+                            title: widget.title,
+                            id: widget.id,
+                            user:widget.user,
+                            type: widget.type,
+                          )));
                     },
                     borderRadius: BorderRadius.circular(16.0),
                     child: Container(
@@ -92,8 +104,8 @@ class ListRow extends StatelessWidget {
                 builder: (BuildContext context, state) {
                   if (state is AuthLoginState){
                     return buildMovieList();
-                }
-                    return SizedBox.shrink();
+                  }
+                  return SizedBox.shrink();
                 },
               ),
             ),
@@ -104,10 +116,10 @@ class ListRow extends StatelessWidget {
   }
 
   Widget buildMovieList() {
-    return BlocBuilder<MoviesBloc, MoviesState>(
-      bloc: _moviesBloc,
-      builder: (BuildContext context, MoviesState state) {
-        if (state is MovieLoadingState) {
+    return BlocBuilder<TvBloc, TvState>(
+      bloc: _tvBloc,
+      builder: (BuildContext context, TvState state) {
+        if (state is TvLoadingState) {
           return Center(child: CircularProgressIndicator());
         }
 
@@ -115,67 +127,68 @@ class ListRow extends StatelessWidget {
           return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("An error occured!"),
-              RaisedButton(
-                child: Text("Retry"),
-                onPressed: () =>
-                    _moviesBloc.add(LoadMoviesEvent(id: id, type: type)),
-              )
-            ],
-          ));
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("An error occured!"),
+                  RaisedButton(
+                    child: Text("Retry"),
+//                    onPressed: () =>
+//                        _tvBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+                  )
+                ],
+              ));
         }
 
-        if (state is MoviesLoadedState) {
-          var movieList = state.movies;
-          var movies = movieList.results;
-          if (movies != null) {
-            if (movies.length > 0) {
-              if (movies.length > 10) {
-                movies = movies.sublist(0, 8);
+        if (state is TvLoadedState) {
+          var tvList = state.tvs;
+          var tvs = tvList.results;
+          if (tvs != null) {
+            if (tvs.length > 0) {
+              if (tvs.length > 10) {
+                tvs = tvs.sublist(0, 8);
               }
               return ListView.builder(
                 physics: BouncingScrollPhysics(),
-                itemCount: movies.length,
+                itemCount: tvs.length,
                 addAutomaticKeepAlives: true,
                 // shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int index) {
                   // print(movies[index].title);
                   // Movie movie=movies[index];
-                  return MovieItemHorizontal(movie: movies[index],user: user,);
+//                  return Text(tvs[index].name);
+                  return TvItemHorizontal(tv: tvs[index],user: widget.user,);
                 },
               );
             }
           } else {
             return Center(
                 child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text("Nothing was found!"),
-                RaisedButton(
-                  child: Text("Retry"),
-                  onPressed: () =>
-                      _moviesBloc.add(LoadMoviesEvent(id: id, type: type)),
-                )
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Nothing was found!"),
+                    RaisedButton(
+                      child: Text("Retry"),
+//                      onPressed: () =>
+//                          _moviesBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+                    )
+                  ],
+                ));
           }
         }
 
         return Center(
             child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("An error occured!"),
-            RaisedButton(
-              child: Text("Retry"),
-              onPressed: () =>
-                  _moviesBloc.add(LoadMoviesEvent(id: id, type: type)),
-            )
-          ],
-        ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("An error occured!"),
+                RaisedButton(
+                  child: Text("Retry"),
+//                  onPressed: () =>
+//                      _tvBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+                )
+              ],
+            ));
       },
     );
   }

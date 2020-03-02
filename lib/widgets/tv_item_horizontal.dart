@@ -1,29 +1,28 @@
+import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
+import 'package:MovieDB/model/tv_list_model.dart';
+import 'package:MovieDB/pages/tv_detail_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
-import 'package:MovieDB/model/movie_details.dart';
-import 'package:MovieDB/model/movie_list.dart';
-import 'package:MovieDB/pages/movie_detail_page.dart';
 import 'package:MovieDB/repository/constants.dart';
-import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/custom_path_clipper.dart';
 
-class MovieItemHorizontal extends StatelessWidget {
-  const MovieItemHorizontal({
+class TvItemHorizontal extends StatelessWidget {
+  const TvItemHorizontal({
     Key key,
-    @required this.movie,
+    @required this.tv,
     this.user,
   }) : super(key: key);
 
-  final Results movie;
+  final Result tv;
   final FirebaseUser user;
 
   @override
   Widget build(BuildContext context) {
-    MoviesBloc _moviesBloc = MoviesBloc();
-    _moviesBloc.add(GetWatchListItemEvent(id: movie.id, uid: user?.uid));
+    TvBloc _tvBloc = TvBloc();
+    print("${tv.id}");
+//    _moviesBloc.add(GetWatchListItemEvent(id: movie.id, uid: user?.uid));
     return Container(
       margin: EdgeInsets.all(8.0),
       width: 100,
@@ -32,7 +31,7 @@ class MovieItemHorizontal extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) =>
-                  MovieDetailPage(id: movie.id)));
+                  TvDetailPage(id: tv.id)));
         },
         child: Container(
 //        margin: EdgeInsets.all(10.0),
@@ -52,7 +51,7 @@ class MovieItemHorizontal extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
-                        imageUrl:movie.posterPath!=null? "${IMAGE_URL + movie.posterPath}":"",
+                        imageUrl:tv.posterPath!=null? "${IMAGE_URL + tv.posterPath}":"",
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
                             Center(child: CircularProgressIndicator()),
@@ -67,7 +66,7 @@ class MovieItemHorizontal extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            '${movie.title}',
+                            '${tv.name}',
                             style: TextStyle(fontWeight: FontWeight.w500),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -78,7 +77,7 @@ class MovieItemHorizontal extends StatelessWidget {
                                 Icons.star,
                                 color: Colors.orange,
                               ),
-                              Text('${movie.voteAverage}')
+                              Text('${tv.voteAverage}')
                             ],
                           )
                         ],
@@ -87,20 +86,20 @@ class MovieItemHorizontal extends StatelessWidget {
               ],
             ),
             user != null
-                ? BlocBuilder<MoviesBloc, MoviesState>(
-                    bloc: _moviesBloc,
-                    builder: (BuildContext context, MoviesState state) {
+                ? BlocBuilder<TvBloc, TvState>(
+                    bloc: _tvBloc,
+                    builder: (BuildContext context, TvState state) {
                       if (state is WatchListItem) {
-                        return buildWatchListTag(state, _moviesBloc, context);
+                        return buildWatchListTag(state, _tvBloc, context);
                       }
                       return ClipPath(
                           child: InkWell(
                             onTap: () async {
-                              MovieDetails movieDetails =
-                                  await new MovieRepository()
-                                      .getMovieDetails(movie.id);
-                              _moviesBloc.add(AddWatchListEvent(
-                                  movieDetails: movieDetails, uid: user.uid));
+//                              MovieDetails movieDetails =
+//                                  await new MovieRepository()
+//                                      .getMovieDetails(tv.id);
+//                              _moviesBloc.add(AddWatchListEvent(
+//                                  movieDetails: movieDetails, uid: user.uid));
                             },
                             child: Container(
                               height: 50,
@@ -128,19 +127,19 @@ class MovieItemHorizontal extends StatelessWidget {
   }
 
   Widget buildWatchListTag(
-      WatchListItem state, MoviesBloc _moviesBloc, BuildContext context) {
+      WatchListItem state, TvBloc tvBloc, BuildContext context) {
     return Container(
       child: ClipPath(
           child: InkWell(
             onTap: () async {
               if (state.watchListItem != null) {
-                _moviesBloc.add(
-                    DeleteWatchListMovieItem(uid: user.uid, movieId: movie.id));
+//                _moviesBloc.add(
+//                    DeleteWatchListMovieItem(uid: user.uid, movieId: movie.id));
               } else {
-                MovieDetails movieDetails =
-                    await new MovieRepository().getMovieDetails(movie.id);
-                _moviesBloc.add(AddWatchListEvent(
-                    movieDetails: movieDetails, uid: user.uid));
+//                MovieDetails movieDetails =
+//                    await new MovieRepository().getMovieDetails(movie.id);
+//                _moviesBloc.add(AddWatchListEvent(
+//                    movieDetails: movieDetails, uid: user.uid));
               }
             },
             child: Container(

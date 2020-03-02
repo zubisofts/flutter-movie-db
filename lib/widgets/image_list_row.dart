@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/repository/constants.dart';
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
+import 'package:MovieDB/model/person_images.dart';
+import 'package:MovieDB/repository/constants.dart';
 
 // class ImageList extends StatefulWidget {
 //   final int id;

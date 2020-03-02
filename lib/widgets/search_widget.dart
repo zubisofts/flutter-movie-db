@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/model/movie.dart';
-import 'package:flutter_ui_challenge/pages/movie_list_page.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
+import 'package:MovieDB/model/movie.dart';
+import 'package:MovieDB/pages/movie_list_page.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
 
 class SearchWidget extends SearchDelegate<Movie> {
 

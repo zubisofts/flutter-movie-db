@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/pages/home.dart';
-import 'package:flutter_ui_challenge/widgets/loading_button.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/pages/home.dart';
+import 'package:MovieDB/widgets/loading_button.dart';
 
 import 'sign_up_page.dart';
 

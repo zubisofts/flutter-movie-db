@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/widgets/loading_button.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/widgets/loading_button.dart';
 
 import 'home.dart';
 import 'sign_in_page.dart';

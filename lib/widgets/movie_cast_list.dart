@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/model/credit.dart';
-import 'package:flutter_ui_challenge/pages/movie_credits_page.dart';
-import 'package:flutter_ui_challenge/widgets/movie_cast_item.dart';
+import 'package:MovieDB/model/credit.dart';
+import 'package:MovieDB/pages/movie_credits_page.dart';
+import 'package:MovieDB/widgets/movie_cast_item.dart';
 
 class MovieCastList extends StatefulWidget {
   final String title;

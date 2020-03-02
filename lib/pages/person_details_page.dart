@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_event.dart';
-import 'package:flutter_ui_challenge/model/movie_list.dart';
-import 'package:flutter_ui_challenge/model/person.dart';
-import 'package:flutter_ui_challenge/repository/constants.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
-import 'package:flutter_ui_challenge/widgets/curved_path_bg.dart';
-import 'package:flutter_ui_challenge/widgets/image_list_row.dart';
-import 'package:flutter_ui_challenge/widgets/movie_item_horizontal.dart';
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
+import 'package:MovieDB/model/movie_list.dart';
+import 'package:MovieDB/model/person.dart';
+import 'package:MovieDB/repository/constants.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
+import 'package:MovieDB/widgets/curved_path_bg.dart';
+import 'package:MovieDB/widgets/image_list_row.dart';
+import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:intl/intl.dart';
 
 class PersonDetailsPage extends StatefulWidget {
@@ -247,7 +247,7 @@ class _DetailsWidgetState extends State<DetailsWidget> {
     
     return FutureBuilder(
       future: new MovieRepository().getMovieCredits(id),
-       builder: (BuildContext context, AsyncSnapshot<List<Results>> snapshot) {
+       builder: (BuildContext context, AsyncSnapshot snapshot) {
          if(snapshot.hasData){
            List<Results> results=snapshot.data;
            if(results.length>0)

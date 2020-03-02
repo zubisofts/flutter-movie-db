@@ -1,3 +1,6 @@
+import 'package:MovieDB/model/tv_list_model.dart';
+import 'package:MovieDB/repository/tv_series_repository.dart';
+import 'package:MovieDB/widgets/tv_item_horizontal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,13 +13,13 @@ import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:MovieDB/widgets/movie_item_vertical.dart';
 
-class MoviesListPage extends StatefulWidget {
+class TvListPage extends StatefulWidget {
   final int id;
   final String title;
-  final MovieCat type;
+  final TvCat type;
   final FirebaseUser user;
 
-  MoviesListPage({
+  TvListPage({
     Key key,
     this.id,
     this.title,
@@ -25,10 +28,10 @@ class MoviesListPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MoviesListPageState createState() => _MoviesListPageState();
+  _TvListPageState createState() => _TvListPageState();
 }
 
-class _MoviesListPageState extends State<MoviesListPage> {
+class _TvListPageState extends State<TvListPage> {
   bool isVertical = false;
 
   @override
@@ -57,18 +60,18 @@ class _MoviesListPageState extends State<MoviesListPage> {
                   )),
         ),
         body: FutureBuilder(
-          future: new MovieRepository().getMovies(widget.type, widget.id, 1),
+          future: new TVRepository().getTvShows(widget.type, widget.id, 1),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.data == null) {
               return Center(
                 child: CircularProgressIndicator(),
               );
             }
-            return MovieListLayout(
+            return TvListLayout(
               type: widget.type,
               id: widget.id,
               user: widget.user,
-              movieList: snapshot.data,
+              tvList: snapshot.data,
               isVertical: isVertical,
             );
           },
@@ -92,47 +95,47 @@ class _MoviesListPageState extends State<MoviesListPage> {
                   }
                   return SizedBox.shrink();
                 },
-                
+
               )
             : SizedBox.shrink());
   }
 }
 
-class MovieListLayout extends StatefulWidget {
-  final MovieList movieList;
-  final MovieCat type;
+class TvListLayout extends StatefulWidget {
+  final Tv tvList;
+  final TvCat type;
   final int id;
   final bool isVertical;
   final FirebaseUser user;
 
-  MovieListLayout(
-      {Key key, this.movieList, this.type, this.id, this.isVertical, this.user})
+  TvListLayout(
+      {Key key, this.tvList, this.type, this.id, this.isVertical, this.user})
       : super(key: key);
 
   @override
-  _MovieListLayoutState createState() => _MovieListLayoutState();
+  _TvListLayoutState createState() => _TvListLayoutState();
 }
 
-class _MovieListLayoutState extends State<MovieListLayout> {
+class _TvListLayoutState extends State<TvListLayout> {
   ScrollController scrollController = ScrollController();
 
-  List<Results> movies;
+  List<Result> tvs;
 
   int currentPage = 1;
   int totalPage;
   bool isLoading = false;
 
   void loadMoreMovies() async {
-    var mMovies = await new MovieRepository()
-        .getMovies(widget.type, widget.id, currentPage + 1);
-    if (mMovies != null) {
-      currentPage = mMovies.page;
+    var mTvs = await new TVRepository()
+        .getTvShows(widget.type, widget.id, currentPage + 1);
+    if (mTvs != null) {
+      currentPage = mTvs.page;
       // print('$currentPage/$totalPage');
-      mMovies.results.add(null);
+      mTvs.results.add(null);
       if (mounted)
         setState(() {
           isLoading = false;
-          movies.addAll(mMovies.results);
+          tvs.addAll(mTvs.results);
         });
     }
   }
@@ -154,8 +157,8 @@ class _MovieListLayoutState extends State<MovieListLayout> {
 
   @override
   void initState() {
-    movies = widget.movieList.results;
-    totalPage = widget.movieList.totalPages;
+    tvs = widget.tvList.results;
+    totalPage = widget.tvList.totalPages;
     super.initState();
   }
 
@@ -172,13 +175,13 @@ class _MovieListLayoutState extends State<MovieListLayout> {
             child: ListView.builder(
               controller: scrollController,
               physics: BouncingScrollPhysics(),
-              itemCount: movies.length,
+              itemCount: tvs.length,
               // shrinkWrap: true,
               itemBuilder: (BuildContext context, int index) {
                 // print(movies[index].title);
                 // Movie movie=movies[index];
-                if (index == movies.length - 1) {
-                  movies.removeLast();
+                if (index == tvs.length - 1) {
+                  tvs.removeLast();
                   return Center(
                       child: SpinKitThreeBounce(
                     color: Colors.greenAccent,
@@ -186,10 +189,10 @@ class _MovieListLayoutState extends State<MovieListLayout> {
                 }
                 // if(movies[index]==null)
                 //  return SizedBox.shrink();
-                if (movies[index] != null) {
+                if (tvs[index] != null) {
 //                  print(movies[index].title);
-                  return MovieItemVertical(
-                    movie: movies[index],
+                  return TvItemHorizontal(
+                    tv: tvs[index],
                     user: widget.user,
                   );
                 }
@@ -201,17 +204,17 @@ class _MovieListLayoutState extends State<MovieListLayout> {
             onNotification: onNotificatin,
             child: GridView.builder(
               controller: scrollController,
-              itemCount: movies.length,
+              itemCount: tvs.length,
               physics: BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
-                if (index == movies.length - 1) {
-                  movies.removeLast();
+                if (index == tvs.length - 1) {
+                  tvs.removeLast();
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-                return MovieItemHorizontal(
-                  movie: movies[index],
+                return TvItemHorizontal(
+                  tv: tvs[index],
                   user: widget.user,
                 );
               },

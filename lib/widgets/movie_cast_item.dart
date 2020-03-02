@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/model/credit.dart';
-import 'package:flutter_ui_challenge/pages/person_details_page.dart';
-import 'package:flutter_ui_challenge/repository/constants.dart';
+import 'package:MovieDB/model/credit.dart';
+import 'package:MovieDB/pages/person_details_page.dart';
+import 'package:MovieDB/repository/constants.dart';
 
 class MovieCastItem extends StatelessWidget {
   const MovieCastItem({

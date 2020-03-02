@@ -1,9 +1,10 @@
+import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/app_bloc/app_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/pages/home.dart';
+import 'package:MovieDB/bloc/app_bloc/app_bloc.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
+import 'package:MovieDB/pages/home.dart';
 // import 'package:google_fonts/google_fonts.dart';
 
 void main() => runApp(MultiBlocProvider(
@@ -13,6 +14,9 @@ void main() => runApp(MultiBlocProvider(
         ),
         BlocProvider<MoviesBloc>(
           create: (BuildContext context) => MoviesBloc(),
+        ),
+        BlocProvider<TvBloc>(
+          create: (BuildContext context) => TvBloc(),
         ),
         BlocProvider<AuthBloc>(
           create: (BuildContext context) => AuthBloc(),
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     BlocProvider.of<AppBloc>(context).add(GetThemeValueEvent());
-    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());  
+    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
     return BlocBuilder<AppBloc, AppState>(
       builder: (BuildContext context, AppState state) {
         // BlocProvider.of(context).add(GetThemeValueEvent());
@@ -48,9 +52,13 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: false,
           theme: value
-              ? ThemeData(brightness: Brightness.dark)
-              : ThemeData(brightness: Brightness.light).copyWith(
-                  primaryColor: Colors.orange, accentColor: Colors.orange),
+              ? ThemeData(
+                  brightness: Brightness.dark,
+                  fontFamily: "Serif",
+                )
+              : ThemeData(brightness: Brightness.light, fontFamily: "Serif")
+                  .copyWith(
+                      primaryColor: Colors.orange, accentColor: Colors.orange),
           home: Home(),
         );
       },

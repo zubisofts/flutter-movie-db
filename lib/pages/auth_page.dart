@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/pages/sign_in_page.dart';
+import 'package:MovieDB/pages/sign_in_page.dart';
 
 import 'sign_up_page.dart';
 

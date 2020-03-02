@@ -1,16 +1,17 @@
+import 'package:MovieDB/fragments/tv_category.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/auth_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/fragments/discover_page.dart';
-import 'package:flutter_ui_challenge/fragments/movies_category.dart';
-import 'package:flutter_ui_challenge/fragments/news_page.dart';
-import 'package:flutter_ui_challenge/pages/profile_screen.dart';
-import 'package:flutter_ui_challenge/widgets/auth_modal_form.dart';
+import 'package:MovieDB/bloc/auth_bloc/auth_bloc.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/fragments/discover_page.dart';
+import 'package:MovieDB/fragments/movies_category.dart';
+import 'package:MovieDB/fragments/news_page.dart';
+import 'package:MovieDB/pages/profile_screen.dart';
+import 'package:MovieDB/widgets/auth_modal_form.dart';
 
-import 'package:flutter_ui_challenge/widgets/search_widget.dart';
+import 'package:MovieDB/widgets/search_widget.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -22,11 +23,7 @@ class _HomeState extends State<Home> {
   PageController _pageController;
   List<Widget> pages = [
     MainPage(),
-    Container(
-      child: Center(
-        child: Text("TV Series coming soon :)"),
-      ),
-    ),
+    TvCategory(),
     DiscoverPage(),
     NewsPage(),
   ];
@@ -89,7 +86,8 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     user != null
                         ? Navigator.of(context).push(MaterialPageRoute(
-                            builder: (BuildContext ctx) => ProfileScreen(user:user)))
+                            builder: (BuildContext ctx) =>
+                                ProfileScreen(user: user)))
                         :
                         // widget.user == null?
                         // Navigator.of(context).push(MaterialPageRoute(
@@ -151,7 +149,8 @@ class _HomeState extends State<Home> {
           BottomNavigationBarItem(
               icon: Icon(Icons.live_tv), title: Text("TV Series")),
           BottomNavigationBarItem(
-              icon: Icon(MaterialIcons.open_in_browser), title: Text("Discover")),
+              icon: Icon(MaterialIcons.open_in_browser),
+              title: Text("Discover")),
           BottomNavigationBarItem(
               icon: Icon(FontAwesome.newspaper_o), title: Text("News"))
         ],

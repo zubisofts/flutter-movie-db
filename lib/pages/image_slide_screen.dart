@@ -4,11 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ui_challenge/repository/movie_repository.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:getflutter/components/carousel/gf_carousel.dart';
 
-import 'package:flutter_ui_challenge/model/movie_images.dart';
-import 'package:flutter_ui_challenge/repository/constants.dart';
+import 'package:MovieDB/model/movie_images.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class ImageSlideScreen extends StatefulWidget {
