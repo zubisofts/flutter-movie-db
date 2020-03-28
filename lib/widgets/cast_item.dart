@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/model/credit.dart';
-import 'package:flutter_ui_challenge/pages/person_details_page.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
+import 'package:MovieDB/model/credit.dart';
+import 'package:MovieDB/pages/person_details_page.dart';
+import 'package:MovieDB/repository/constants.dart';
 
 class MovieCastItem extends StatelessWidget {
   const MovieCastItem({
@@ -47,23 +47,26 @@ class MovieCastItem extends StatelessWidget {
                 flex: 6,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        '${cast.name}',
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '(${cast.character})',
-                        style: TextStyle(
-                            color: Colors.grey, fontStyle: FontStyle.italic),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                  child: SizedBox(
+                    width: 130,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          '${cast.name}',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '(${cast.character})',
+                          style: TextStyle(
+                              color: Colors.grey, fontStyle: FontStyle.italic),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 )),
           ],

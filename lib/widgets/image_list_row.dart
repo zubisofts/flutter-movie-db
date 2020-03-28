@@ -1,14 +1,25 @@
+import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
+import 'package:MovieDB/model/person_images.dart';
+import 'package:MovieDB/repository/constants.dart';
+import 'package:shimmer/shimmer.dart';
+
+// class ImageList extends StatefulWidget {
+//   final int id;
+
+//   ImageList({Key key, this.id}) : super(key: key);
+
+//   @override
+//   _ImageListState createState() => _ImageListState();
+// }
 
 class ImageList extends StatefulWidget {
   final int id;
 
-  ImageList({Key key, this.id}) : super(key: key);
+  ImageList({this.id});
 
   @override
   _ImageListState createState() => _ImageListState();
@@ -19,7 +30,6 @@ class _ImageListState extends State<ImageList> {
 
   @override
   void initState() {
-    print("Person id:${widget.id}");
     super.initState();
     _moviesBloc.add(GetPersonImagesEvent(id: widget.id));
   }
@@ -32,8 +42,8 @@ class _ImageListState extends State<ImageList> {
       child: BlocBuilder<MoviesBloc, MoviesState>(
         bloc: _moviesBloc,
         builder: (BuildContext context, MoviesState state) {
-          if (state is LoadingState) {
-            return Center(child: CircularProgressIndicator());
+          if (state is MovieLoadingState) {
+            return Center(child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",));
           }
           if (state is PersonImagesState) {
             var personImages = state.images;
@@ -75,8 +85,7 @@ class _ImageListState extends State<ImageList> {
               Text("An error occured!"),
               RaisedButton(
                 child: Text("Retry"),
-                onPressed: () =>
-                    _moviesBloc.add(GetPersonImagesEvent(id: widget.id)),
+                onPressed: () => _moviesBloc.add(GetPersonImagesEvent(id: widget.id)),
               )
             ],
           ));
@@ -96,8 +105,14 @@ class _ImageListState extends State<ImageList> {
       child: CachedNetworkImage(
         imageUrl: "${IMAGE_URL + image.filePath}",
         fit: BoxFit.cover,
-        placeholder: (context, url) =>
-            Center(child: CircularProgressIndicator()),
+        placeholder: (context, url) => Center(
+            child: Shimmer.fromColors(
+                child: Container(
+                  height: 150,
+                  width: 120,
+                ),
+                baseColor: Colors.grey[600],
+                highlightColor: Colors.grey[700])),
         errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/pages/sign_in_page.dart';
+import 'package:MovieDB/pages/sign_in_page.dart';
 
 import 'sign_up_page.dart';
 
@@ -117,10 +117,10 @@ class _AuthPageState extends State<AuthPage> {
 }
 
 class ListItem extends StatelessWidget {
-  String title;
-  String subTitle;
-  Color iconColor;
-  IconData icon;
+  final String title;
+  final String subTitle;
+  final Color iconColor;
+  final IconData icon;
   ListItem({
     Key key,
     this.title,

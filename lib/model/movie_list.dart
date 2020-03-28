@@ -41,7 +41,7 @@ class MovieList {
 }
 
 class Results {
-  double popularity;
+  dynamic popularity;
   dynamic voteCount;
   bool video;
   String posterPath;

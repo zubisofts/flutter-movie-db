@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/auth_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/widgets/loading_button.dart';
+import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
+import 'package:MovieDB/widgets/loading_button.dart';
 
 import 'home.dart';
 import 'sign_in_page.dart';
@@ -175,7 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               return SizedBox.shrink();
                             }
 
-                            if (state is ErrorState) {
+                            if (state is AuthErrorState) {
                               return Center(
                                   child: Text(
                                 "${state.error}",
@@ -195,7 +195,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       BlocBuilder(
                         bloc: _authBloc,
                         builder: (BuildContext context, state) {
-                          if (state is LoadingState) {
+                          if (state is AuthLoadingState) {
                             return LoadingButton(
                               text: "Creating Account...",
                             );
@@ -209,7 +209,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 decoration: BoxDecoration(color: Colors.blue),
                                 child: Center(
                                   child: Text(
-                                    "Sign In",
+                                    "Create Account",
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500),

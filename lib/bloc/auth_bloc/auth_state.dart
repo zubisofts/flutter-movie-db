@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
 
-import 'package:flutter_ui_challenge/model/user.dart';
+import 'package:MovieDB/model/user.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -13,7 +15,7 @@ class InitialAuthState extends AuthState {
 
 class LoggedInState extends AuthState {
 
-final User user;
+final FirebaseUser user;
   LoggedInState({
     this.user,
   });
@@ -40,15 +42,15 @@ final User user;
   List<Object> get props => [user];
 }
 
-class LoadingState extends AuthState {
+class AuthLoadingState extends AuthState {
 
   @override
   List<Object> get props => [];
 }
 
-class EmailChangeState{
+class EmailChangeState extends MoviesState{
 
-  String email;
+  final String email;
   EmailChangeState({
     this.email,
   });
@@ -59,7 +61,7 @@ class EmailChangeState{
 
 class PasswordChangeState extends AuthState {
 
-  String password;
+  final String password;
   PasswordChangeState({
     this.password,
   });
@@ -68,14 +70,25 @@ class PasswordChangeState extends AuthState {
   List<Object> get props => [password];
 }
 
-class ErrorState extends AuthState {
+class AuthErrorState extends AuthState {
 
 final String error;
-  ErrorState({
+  AuthErrorState({
     this.error,
   });
 
   @override
   List<Object> get props => [error];
+  
+}
+class AuthLoginState extends AuthState {
+
+final FirebaseUser user;
+  AuthLoginState({
+    this.user,
+  });
+
+  @override
+  List<Object> get props => [user];
   
 }

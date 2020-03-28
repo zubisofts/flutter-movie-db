@@ -1,16 +1,26 @@
+import 'package:MovieDB/model/genre.dart';
+import 'package:MovieDB/model/movie_review.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_ui_challenge/model/credit.dart';
-import 'package:flutter_ui_challenge/model/movie_details.dart';
-import 'package:flutter_ui_challenge/model/movie_list.dart';
-import 'package:flutter_ui_challenge/model/person.dart';
-import 'package:flutter_ui_challenge/model/person_images.dart';
-import 'package:flutter_ui_challenge/model/video_details.dart';
+import 'package:MovieDB/model/credit.dart';
+import 'package:MovieDB/model/favourite.dart';
+import 'package:MovieDB/model/movie_details.dart';
+import 'package:MovieDB/model/movie_list.dart';
+import 'package:MovieDB/model/person.dart';
+import 'package:MovieDB/model/person_images.dart';
+import 'package:MovieDB/model/video_details.dart';
+import 'package:flutter/material.dart';
 
 abstract class MoviesState extends Equatable {
   const MoviesState();
 }
 
 class InitialMoviesState extends MoviesState {
+  @override
+  List<Object> get props => [];
+}
+
+class MovieLoadingState extends MoviesState {
   @override
   List<Object> get props => [];
 }
@@ -22,6 +32,7 @@ class LoadingState extends MoviesState {
 
 class MoviesLoadedState extends MoviesState {
   final MovieList movies;
+
   MoviesLoadedState({
     this.movies,
   });
@@ -32,6 +43,7 @@ class MoviesLoadedState extends MoviesState {
 
 class MoreMoviesLoadedState extends MoviesState {
   final MovieList movies;
+
   MoreMoviesLoadedState({
     this.movies,
   });
@@ -54,11 +66,12 @@ class MovieDetailsReadyState extends MoviesState {
   });
 
   @override
-  List<Object> get props => [movieDetails,videoDetails,similarMovies];
+  List<Object> get props => [movieDetails, videoDetails, similarMovies];
 }
 
 class MovieVideosReadyState extends MoviesState {
   final VideoDetails videoDetails;
+
   MovieVideosReadyState({
     this.videoDetails,
   });
@@ -69,6 +82,7 @@ class MovieVideosReadyState extends MoviesState {
 
 class PersonDetialsState extends MoviesState {
   final Person person;
+
   PersonDetialsState({
     this.person,
   });
@@ -79,10 +93,113 @@ class PersonDetialsState extends MoviesState {
 
 class PersonImagesState extends MoviesState {
   final PersonImages images;
+
   PersonImagesState({
     this.images,
   });
 
   @override
   List<Object> get props => [images];
+}
+
+class FavouritesState extends MoviesState {
+  final List favourites;
+
+  FavouritesState({
+    this.favourites,
+  });
+
+  @override
+  List<Object> get props => [favourites];
+}
+
+class FavouriteItemState extends MoviesState {
+  final favourite;
+
+  FavouriteItemState({
+    this.favourite,
+  });
+
+  @override
+  List<Object> get props => [favourite];
+}
+
+class FavouriteMoviesLoaded extends MoviesState {
+  final List favourites;
+
+  FavouriteMoviesLoaded({
+    this.favourites,
+  });
+
+  @override
+  List<Object> get props => [favourites];
+}
+
+// class WatchListState extends MoviesState {
+//   final List<MovieDetails> watchList;
+//   WatchListState({
+//     this.watchList,
+//   });
+
+//   @override
+//   List<Object> get props => [watchList];
+// }
+
+class WatchListItem extends MoviesState {
+  final watchListItem;
+
+  WatchListItem({
+    this.watchListItem,
+  });
+
+  @override
+  List<Object> get props => [watchListItem];
+}
+
+class WatchListMoviesLoaded extends MoviesState {
+  final List watchList;
+  final MediaType mediaType;
+
+  WatchListMoviesLoaded({
+    this.watchList,
+    this.mediaType
+  });
+
+  @override
+  List<Object> get props => [watchList,mediaType];
+}
+
+class MovieErrorState extends MoviesState {
+  @override
+  List<Object> get props => [];
+}
+
+class MovieReviewsLoaded extends MoviesState {
+  final MovieReview movieReview;
+
+  MovieReviewsLoaded({@required this.movieReview});
+
+  @override
+  List<Object> get props => [movieReview];
+}
+class GenresState extends MoviesState {
+  final Genry genry;
+
+GenresState({
+    this.genry,
+  });
+
+  @override
+  List<Object> get props => [genry];
+}
+
+class DiscoverState extends MoviesState {
+  final dynamic items;
+
+DiscoverState({
+    this.items,
+  });
+
+  @override
+  List<Object> get props => [items];
 }

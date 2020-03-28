@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:MovieDB/repository/constants.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';

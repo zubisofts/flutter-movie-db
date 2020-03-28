@@ -1,4 +1,3 @@
-import 'package:flutter_ui_challenge/respository/constants.dart';
 
 class Credit {
   int id;

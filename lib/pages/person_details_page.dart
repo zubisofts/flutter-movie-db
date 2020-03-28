@@ -1,18 +1,19 @@
+import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_bloc.dart';
-import 'package:flutter_ui_challenge/bloc/movies_bloc/movies_event.dart';
-import 'package:flutter_ui_challenge/model/movie_list.dart';
-import 'package:flutter_ui_challenge/model/person.dart';
-import 'package:flutter_ui_challenge/respository/constants.dart';
-import 'package:flutter_ui_challenge/respository/movie_respository.dart';
-import 'package:flutter_ui_challenge/widgets/curved_path_bg.dart';
-import 'package:flutter_ui_challenge/widgets/image_list_row.dart';
-import 'package:flutter_ui_challenge/widgets/movie_item_horizontal.dart';
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
+import 'package:MovieDB/model/movie_list.dart';
+import 'package:MovieDB/model/person.dart';
+import 'package:MovieDB/repository/constants.dart';
+import 'package:MovieDB/repository/movie_repository.dart';
+import 'package:MovieDB/widgets/curved_path_bg.dart';
+import 'package:MovieDB/widgets/image_list_row.dart';
+import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:intl/intl.dart';
 
 class PersonDetailsPage extends StatefulWidget {
@@ -50,10 +51,10 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                 return DetailsWidget(person: person);
               }
             }
-            if (state is LoadingState) {
+            if (state is MovieLoadingState) {
               return Center(
                 child:
-                    SpinKitRotatingCircle(color: Theme.of(context).accentColor),
+                LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
               );
             }
 
@@ -122,21 +123,22 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                 child: ClipPath(
                   clipper: CurvedPath(),
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    width: screenSize.width,
+                    height: screenSize.height,
                     color: Colors.redAccent,
-                    child: Image.network(
+                    child:widget.person.profilePath != null ? Image.network(
                       IMAGE_URL + widget.person.profilePath,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
+                      width: screenSize.width,
+                      height: screenSize.height,
                       fit: BoxFit.cover,
-                    ),
+                    ):Icon(Icons.person,size:100),
                   ),
                 ),
               ),
             ),
           ),
           SliverList(
+            
             delegate: SliverChildListDelegate(
               [
               Container(
@@ -145,7 +147,7 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.7,
+                        width: screenSize.width * 0.7,
                         child: Text(
                           widget.person.name,
                           style: TextStyle(
@@ -154,19 +156,22 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                     SizedBox(
                       height: 8,
                     ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.redAccent,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(widget.person.placeOfBirth),
-                      ],
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width*0.8,
+                                          child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.redAccent,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(child: Text(widget.person.placeOfBirth)),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: 8,
@@ -242,8 +247,8 @@ class _DetailsWidgetState extends State<DetailsWidget> {
   Widget _buildMoviesRow(int id) {
     
     return FutureBuilder(
-      future: new MovieRespository().getMovieCredits(id),
-       builder: (BuildContext context, AsyncSnapshot<List<Results>> snapshot) {
+      future: new MovieRepository().getMovieCredits(id),
+       builder: (BuildContext context, AsyncSnapshot snapshot) {
          if(snapshot.hasData){
            List<Results> results=snapshot.data;
            if(results.length>0)
