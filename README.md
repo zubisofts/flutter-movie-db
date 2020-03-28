@@ -1,6 +1,7 @@
-# flutter_ui_challenge
+# A flutter Movie App (MovieDB) using TMDB API
 
-A new Flutter project.
+This app consumes the TMDB API to showcase movies and TV shows.
+API: https://developers.themoviedb.org
 
 ## Getting Started
 
