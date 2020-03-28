@@ -37,9 +37,9 @@ dependencies:
   flutter_facebook_login: ^3.0.0
   esys_flutter_share:
   flutter_slidable: ^0.5.4
-  #  flutter_rating_bar: ^3.0.1+1
-  getflutter: ^1.0.8
-  extended_text: ^0.7.1
+  shimmer: ^1.1.0
+  getflutter: ^1.0.9
+#  extended_text: ^0.7.1
   # provider: ^4.0.1
 
 
@@ -83,13 +83,36 @@ flutter:
   fonts:
     - family: Merriweather
       fonts:
-        - asset: fonts/Merriweather-Regular.ttf
-        - asset: fonts/Merriweather-Italic.ttf
+        - asset: assets/fonts/Merriweather-Regular.ttf
+        - asset: assets/fonts/Merriweather-Italic.ttf
           style: italic
     - family: Roboto
       fonts:
-        - asset: fonts/Roboto-Regular.ttf
-        - asset: fonts/Roboto-Bold.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
+    - family: Poppins-Bold
+      fonts:
+        - asset: assets/fonts/Poppins-Bold.ttf
+
+    - family: Poppins-Medium
+      fonts:
+        - asset: assets/fonts/Poppins-Medium.ttf
+
+    - family: Poppins-Light
+      fonts:
+        - asset: assets/fonts/Poppins-Light.otf
+
+    - family: Poppins-ExtraLight
+      fonts:
+        - asset: assets/fonts/Poppins-ExtraLight.otf
+
+    - family: Poppins-Regular
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.otf
+
+    - family: Poppins-SemiBold
+      fonts:
+        - asset: assets/fonts/Poppins-SemiBold.otf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

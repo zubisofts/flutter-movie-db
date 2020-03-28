@@ -36,3 +36,14 @@ class LoadTvDetailsEvent extends TvEvent {
   @override
   List<Object> get props => [id];
 }
+class LoadTvSeasonDetailsEvent extends TvEvent {
+final int id;
+final int seasonNo;
+LoadTvSeasonDetailsEvent({
+  this.id,
+  this.seasonNo
+});
+
+@override
+List<Object> get props => [id,seasonNo];
+}

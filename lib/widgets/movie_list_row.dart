@@ -3,6 +3,7 @@ import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
+import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:MovieDB/pages/movie_list_page.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_item_horizontal.dart';
@@ -115,7 +116,7 @@ class _MovieListRowState extends State<MovieListRow> {
       bloc: _moviesBloc,
       builder: (BuildContext context, MoviesState state) {
         if (state is MovieLoadingState) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",));
         }
 
         if (state is AuthErrorState) {

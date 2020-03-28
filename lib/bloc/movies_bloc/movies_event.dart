@@ -1,3 +1,4 @@
+import 'package:MovieDB/repository/constants.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:MovieDB/model/movie_details.dart';
@@ -76,30 +77,34 @@ class GetPersonImagesEvent extends MoviesEvent {
 
 
 class AddFavouritesEvent extends MoviesEvent {
-  final MovieDetails movieDetails;
+  final details;
   final String uid;
+  final MediaType mediaType;
   AddFavouritesEvent({
-    this.movieDetails,
-    this.uid
+    this.details,
+    this.uid,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [movieDetails];
+  List<Object> get props => [details,uid,mediaType];
 }
 
 class GetFavouriteEvent extends MoviesEvent {
   final int id;
   final String uid;
+  final MediaType mediaType;
   GetFavouriteEvent({
     this.id,
-    this.uid
+    this.uid,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [id,uid,mediaType];
 }
 class GetFavouriteMovieEvent extends MoviesEvent {
-  final MovieDetails favourite;
+  final favourite;
   GetFavouriteMovieEvent({
     this.favourite,
   });
@@ -110,8 +115,10 @@ class GetFavouriteMovieEvent extends MoviesEvent {
 
 class LoadFavouriteMoviesEvent extends MoviesEvent {
   final String uid;
+  final MediaType mediaType;
   LoadFavouriteMoviesEvent({
     this.uid,
+    this.mediaType
   });
 
   @override
@@ -119,7 +126,7 @@ class LoadFavouriteMoviesEvent extends MoviesEvent {
 }
 
 class LoadAllFavouritesMovieEvent extends MoviesEvent {
-  final List<MovieDetails> favourites;
+  final List favourites;
   LoadAllFavouritesMovieEvent({
     this.favourites,
   });
@@ -130,30 +137,34 @@ class LoadAllFavouritesMovieEvent extends MoviesEvent {
 
 
 class AddWatchListEvent extends MoviesEvent {
-  final MovieDetails movieDetails;
+  final movieDetails;
   final String uid;
+  final MediaType mediaType;
   AddWatchListEvent({
     this.movieDetails,
-    this.uid
+    this.uid,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [movieDetails,uid];
+  List<Object> get props => [movieDetails,uid,mediaType];
 }
 
 class GetWatchListItemEvent extends MoviesEvent {
   final int id;
   final String uid;
+  final MediaType mediaType;
   GetWatchListItemEvent({
     this.id,
-    this.uid
+    this.uid,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [id,mediaType];
 }
 class GetWatchListMovieEvent extends MoviesEvent {
-  final MovieDetails watchListItem;
+  final watchListItem;
   GetWatchListMovieEvent({
     this.watchListItem,
   });
@@ -164,45 +175,53 @@ class GetWatchListMovieEvent extends MoviesEvent {
 
 class LoadWatchListMoviesEvent extends MoviesEvent {
   final String uid;
+  final MediaType mediaType;
   LoadWatchListMoviesEvent({
     this.uid,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [uid];
+  List<Object> get props => [uid,mediaType,mediaType];
 }
 
 class LoadAllWatchListMovieEvent extends MoviesEvent {
-  final List<MovieDetails> watchLists;
+  final List watchLists;
+  final MediaType mediaType;
   LoadAllWatchListMovieEvent({
     this.watchLists,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [watchLists];
+  List<Object> get props => [watchLists,mediaType];
 }
 
 class DeleteFavouriteMovieItem extends MoviesEvent {
   final int movieId;
   final String uid;
+  final MediaType mediaType;
   DeleteFavouriteMovieItem({
     this.movieId,
     this.uid,
+    this.mediaType
   });
   @override
-  List<Object> get props => [movieId];
+  List<Object> get props => [movieId,uid,mediaType];
 
 }
 
 class DeleteWatchListMovieItem extends MoviesEvent {
   final int movieId;
   final String uid;
+  final MediaType mediaType;
   DeleteWatchListMovieItem({
     this.movieId,
-    this.uid
+    this.uid,
+    this.mediaType
   });
   @override
-  List<Object> get props => [movieId];
+  List<Object> get props => [movieId,uid,mediaType];
 
 }
 
@@ -213,5 +232,30 @@ class GetMovieReviews extends MoviesEvent {
   });
   @override
   List<Object> get props => [movieId];
+
+}
+
+class GetGenres extends MoviesEvent {
+  final MediaType mediaType;
+  GetGenres({
+    this.mediaType,
+  });
+  @override
+  List<Object> get props => [mediaType];
+
+}
+class Discover extends MoviesEvent {
+  final MediaType mediaType;
+  final List<int> genres;
+  final String sortQuery;
+  final String year;
+  Discover({
+    this.mediaType,
+    this.genres,
+    this.sortQuery,
+    this.year
+  });
+  @override
+  List<Object> get props => [mediaType,genres,sortQuery,year];
 
 }

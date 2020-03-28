@@ -1,123 +1,92 @@
+import 'package:MovieDB/model/movie_list.dart';
 import 'package:MovieDB/pages/loading_text_widget.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
-
-import 'package:MovieDB/model/movie_list.dart';
-import 'package:MovieDB/pages/watchlist_page.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:MovieDB/widgets/movie_item_vertical.dart';
 
-class MoviesListPage extends StatefulWidget {
+class DiscoverListFragment extends StatefulWidget {
   final int id;
-  final String title;
-  final MovieCat type;
+  final String sortQuery;
+  final List<int> genres;
+  final String year;
+  final MediaType mediaType;
   final FirebaseUser user;
 
-  MoviesListPage({
+  DiscoverListFragment({
     Key key,
     this.id,
-    this.title,
-    this.type,
-    this.user,
+    this.mediaType,
+    this.sortQuery,
+    this.genres,
+    this.year,
+    this.user
   }) : super(key: key);
 
   @override
-  _MoviesListPageState createState() => _MoviesListPageState();
+  _DiscoverListFragmentState createState() => _DiscoverListFragmentState();
 }
 
-class _MoviesListPageState extends State<MoviesListPage> {
+class _DiscoverListFragmentState extends State<DiscoverListFragment> {
   bool isVertical = false;
 
   @override
   Widget build(BuildContext context) {
-   if(widget.user!=null){
-      BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(uid: widget.user.uid));
-   }
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          actions: <Widget>[
-            IconButton(
-              icon: isVertical ? Icon(Icons.grid_on) : Icon(Icons.list),
-              onPressed: () {
-                setState(() {
-                  isVertical = !isVertical;
-                });
-              },
-            )
-          ],
-          title: Text(widget.title,
-              style: TextStyle(
-                  // color: Theme.of(context).accentColor,
-                  // fontSize: ,
-                  // fontWeight: FontWeight.bold
-                  )),
-        ),
-        body: FutureBuilder(
-          future: new MovieRepository().getMovies(widget.type, widget.id, 1),
+  //  if(widget.user!=null){
+  //     // BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(uid: widget.user.uid));
+  //  }
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      child: FutureBuilder(
+          future: new MovieRepository().discover(widget.sortQuery, widget.genres, widget.year, widget.mediaType,1),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.data == null) {
-              return Center(
-                child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
-              );
-            }
-            return MovieListLayout(
-              type: widget.type,
-              id: widget.id,
-              user: widget.user,
-              movieList: snapshot.data,
-              isVertical: isVertical,
-            );
+      if (snapshot.data == null) {
+        return Center(
+          child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
+        );
+      }
+      MovieList movieList=snapshot.data;
+      print('Snapshot:${movieList.results.length}');
+      return DiscoverListLayout(
+        mediaType: widget.mediaType,
+        user: widget.user,
+        item: snapshot.data,
+        sortQuery: widget.sortQuery,
+        genres: widget.genres,
+        isVertical: isVertical,
+      );
           },
         ),
-        floatingActionButton: widget.user != null
-            ? BlocBuilder<MoviesBloc, MoviesState>(
-                bloc: BlocProvider.of<MoviesBloc>(context),
-                builder: (BuildContext context, MoviesState state) {
-                  if (state is WatchListMoviesLoaded) {
-                    return FloatingActionButton.extended(
-                      backgroundColor: Theme.of(context).accentColor,
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (BuildContext context) => WatchListPage(
-                                  user: widget.user,
-                                )));
-                      },
-                      icon: Icon(Icons.watch_later),
-                      label: Text('${state.watchList.length} ' + '${state.watchList.length>1?'items':'item'}'),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-                
-              )
-            : SizedBox.shrink());
+    ); 
   }
 }
 
-class MovieListLayout extends StatefulWidget {
-  final MovieList movieList;
-  final MovieCat type;
-  final int id;
+class DiscoverListLayout extends StatefulWidget {
+  final dynamic item;
+  final MediaType mediaType;
+   final String sortQuery;
+    final List<int> genres;
+    final String year;
   final bool isVertical;
   final FirebaseUser user;
 
-  MovieListLayout(
-      {Key key, this.movieList, this.type, this.id, this.isVertical, this.user})
+  DiscoverListLayout(
+      {Key key, this.item, this.mediaType,this.isVertical,this.genres,this.sortQuery,this.year, this.user})
       : super(key: key);
 
   @override
-  _MovieListLayoutState createState() => _MovieListLayoutState();
+  _DiscoverListLayoutState createState() => _DiscoverListLayoutState();
 }
 
-class _MovieListLayoutState extends State<MovieListLayout> {
+class _DiscoverListLayoutState extends State<DiscoverListLayout> {
   ScrollController scrollController = ScrollController();
 
-  List<Results> movies;
+  var movies=[];
 
   int currentPage = 1;
   int totalPage;
@@ -125,7 +94,7 @@ class _MovieListLayoutState extends State<MovieListLayout> {
 
   void loadMoreMovies() async {
     var mMovies = await new MovieRepository()
-        .getMovies(widget.type, widget.id, currentPage + 1);
+        .discover(widget.sortQuery,widget.genres,widget.year,widget.mediaType, currentPage + 1);
     if (mMovies != null) {
       currentPage = mMovies.page;
       // print('$currentPage/$totalPage');
@@ -155,8 +124,8 @@ class _MovieListLayoutState extends State<MovieListLayout> {
 
   @override
   void initState() {
-    movies = widget.movieList.results;
-    totalPage = widget.movieList.totalPages;
+    movies = widget.item.results;
+    totalPage = widget.item.totalPages;
     super.initState();
   }
 

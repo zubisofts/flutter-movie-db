@@ -113,20 +113,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  extended_text:
-    dependency: "direct main"
-    description:
-      name: extended_text
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.7.1"
-  extended_text_library:
-    dependency: transitive
-    description:
-      name: extended_text_library
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.3"
   firebase:
     dependency: transitive
     description:
@@ -239,7 +225,7 @@ packages:
       name: getflutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.8"
+    version: "1.0.9"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -415,6 +401,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2+3"
+  shimmer:
+    dependency: "direct main"
+    description:
+      name: shimmer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   sky_engine:
     dependency: transitive
     description: flutter

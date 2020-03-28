@@ -1,4 +1,5 @@
 import 'package:MovieDB/widgets/movie_review_widget.dart';
+import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:MovieDB/widgets/trailers_row_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:MovieDB/pages/sign_in_page.dart';
 import 'package:MovieDB/widgets/auth_modal_form.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:getflutter/components/carousel/gf_carousel.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
@@ -23,7 +25,7 @@ import 'package:MovieDB/pages/image_slide_screen.dart';
 import 'package:MovieDB/repository/constants.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_list_row.dart';
-import 'package:MovieDB/widgets/movie_cast_list.dart';
+import 'package:MovieDB/widgets/cast_list.dart';
 
 import 'movie_list_page.dart';
 
@@ -39,37 +41,20 @@ class MovieDetailPage extends StatefulWidget {
 class _MovieDetailPageState extends State<MovieDetailPage> {
   MoviesBloc _movieBloc = MoviesBloc();
 
-  YoutubePlayerController _controller;
   int backdropindex = 0;
-  String videoId="iLnmTe5Q2Qw";
+  String videoId = "iLnmTe5Q2Qw";
 
   @override
   void initState() {
-    // _controller = YoutubePlayerController(
-
-    //   initialVideoId: 'iLnmTe5Q2Qw',
-    //   flags: YoutubePlayerFlags(
-    //     isLive:true ,
-    //     autoPlay: false,
-    //     mute: false,
-    //   ),
-    // );
-
     // _movieBloc.add(LoadMovieVideosEvent(id: widget.movie.id));
     _movieBloc.add(LoadMovieDetailsEvent(id: widget.id));
     super.initState();
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    
+
 // print(movie.genries);
     return Scaffold(
       // backgroundColor: Colors.white,
@@ -77,38 +62,19 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         bloc: _movieBloc,
         builder: (BuildContext context, state) {
           if (state is MovieLoadingState) {
-            return Center(
-                child: SpinKitHourGlass(
-              color: Colors.greenAccent,
-            ));
+            return LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",);
           }
           if (state is MovieDetailsReadyState) {
             MovieDetails movieDetails = state.movieDetails;
             var videoDetails = state.videoDetails;
             Credit credit = state.credit;
 
-            // BlocProvider.of<MoviesBloc>(context)
-            //     .add(GetFavouriteEvent(id: movieDetails.id));
-            var result = videoDetails.results.length > 0
-                ? videoDetails.results[0]
-                : null;
-            // print(state.similarMovies);
-            videoId='${result != null ? result.key : ""}';
-            _controller = YoutubePlayerController(
-              initialVideoId: videoId,
-              flags: YoutubePlayerFlags(
-                autoPlay: false,
-                mute: false,
-              ),
-
-            );
-          var thumbnail =YoutubePlayer.getThumbnail(videoId: videoId,quality:ThumbnailQuality.standard);
             return CustomScrollView(
               physics: BouncingScrollPhysics(),
               slivers: <Widget>[
                 SliverAppBar(
                   pinned: true,
-                  expandedHeight: screenSize.height * 0.4,
+                  expandedHeight: screenSize.height * 0.45,
                   backgroundColor: Colors.black.withOpacity(0.5),
                   elevation: 8,
                   actions: <Widget>[
@@ -149,7 +115,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       ),
                       Positioned(
                         left: 0,
-                        bottom: 0,
+                        bottom: -1,
                         child: Container(
                           // height: 100,
                           padding: EdgeInsets.only(
@@ -179,8 +145,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                       .textTheme
                                       .title
                                       .copyWith(
-                                        fontSize: 28,
-                                      ),
+                                          fontSize: 28,
+                                          fontFamily: "Poppins-Bold"),
                                 ),
                               ),
                             ],
@@ -201,7 +167,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 32.0),
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
@@ -226,6 +192,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                                   .map((f) => GestureDetector(
                                                       onTap: () {},
                                                       child: Chip(
+//                                                        backgroundColor: Theme.of(context).accentColor.withOpacity(0.5),
                                                         label: Text(f.name),
                                                       )))
                                                   .toList(),
@@ -280,7 +247,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                   ),
 
                                   Text(
-                                    "About Movie",
+                                    "Overview",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
@@ -290,69 +257,52 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                     height: 8,
                                   ),
                                   // ReadMoreText('${movieDetails.overview}',expandingButtonColor: Theme.of(context).accentColor,),
-                                  Text('${movieDetails.overview}'),
+                                  Text('${movieDetails.overview}',
+                                      style: TextStyle(height: 1.5)),
 
                                   SizedBox(
                                     height: 30,
                                   ),
-
-                                  Text(
-                                    "Movie Trailers",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  
-                                  Container(
-                                    height: 200,
-                                    // width: 350,
-                                    margin: EdgeInsets.only(bottom: 20.0),
-                                    child: TrailersVideoRow(videos:videoDetails.results),
-                                    // height: 200,
-
-                                    // width: screenSize.width,
-
-                                    // child: YoutubePlayer(
-                                    //   controller: _controller,
-                                    //   showVideoProgressIndicator: true,
-                                    //   onEnded: (c){
-                                    //     _controller.reload();
-                                    //   },
-                                    //   onReady: () {
-                                    //     // print('ready');
-
-                                    //     _controller.addListener(() {});
-                                    //   },
-                                    //   progressColors: ProgressBarColors(
-                                    //     playedColor: Colors.amber,
-                                    //     handleColor: Colors.amberAccent,
-                                    //   ),
-                                    // ),
-                                  ),
                                 ],
                               ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text(
+                                "Movie Trailers",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              height: 200,
+                              // width: 350,
+                              margin: EdgeInsets.only(bottom: 20.0),
+                              child: TrailersVideoRow(
+                                  videos: videoDetails.results),
                             ),
                             SizedBox(
                               height: 20,
                             ),
-                            MovieCastList(
+                            CastList(
                               title: "Cast",
                               credit: credit,
                             ),
                             SizedBox(
                               height: 20,
                             ),
-
-                             MovieListRow(
-                               title: "Similar Movies",
-                               type: MovieCat.Similar,
-                               id: movieDetails.id,
-                             ),
-                            MovieReviewWidget(movieDetails: movieDetails,)
+                            MovieListRow(
+                              title: "Similar Movies",
+                              type: MovieCat.Similar,
+                              id: movieDetails.id,
+                            ),
+                            MovieReviewWidget(
+                              movieDetails: movieDetails,
+                            )
                           ],
                         ),
                       ),
@@ -444,7 +394,8 @@ class FavouriteWidget extends StatelessWidget {
           FirebaseUser user = state.user;
           MovieDetails fav;
           MoviesBloc mBloc = MoviesBloc();
-          mBloc.add(GetFavouriteEvent(uid: user?.uid, id: movieDetails.id));
+          mBloc.add(GetFavouriteEvent(
+              uid: user?.uid, id: movieDetails.id, mediaType: MediaType.MOVIE));
           return BlocBuilder(
             bloc: mBloc,
             builder: (BuildContext context, state) {
@@ -456,10 +407,14 @@ class FavouriteWidget extends StatelessWidget {
                     if (user != null) {
                       if (state.favourite != null) {
                         mBloc.add(DeleteFavouriteMovieItem(
-                            movieId: movieDetails.id, uid: user.uid));
+                            movieId: movieDetails.id,
+                            uid: user.uid,
+                            mediaType: MediaType.MOVIE));
                       } else {
                         mBloc.add(AddFavouritesEvent(
-                            movieDetails: movieDetails, uid: user.uid));
+                            details: movieDetails,
+                            uid: user.uid,
+                            mediaType: MediaType.MOVIE));
                       }
                     } else {
                       showDialog(
@@ -488,7 +443,9 @@ class FavouriteWidget extends StatelessWidget {
                 onPressed: () {
                   if (user != null) {
                     mBloc.add(AddFavouritesEvent(
-                        movieDetails: movieDetails, uid: user.uid));
+                        details: movieDetails,
+                        uid: user.uid,
+                        mediaType: MediaType.MOVIE));
                   } else {
                     showDialog(
                         useRootNavigator: true,
@@ -532,8 +489,8 @@ class WatchListButton extends StatelessWidget {
       builder: (BuildContext context, AuthState state) {
         if (state is AuthLoginState) {
           var user = state.user;
-          BlocProvider.of<MoviesBloc>(context)
-              .add(GetWatchListItemEvent(id: movieDetails.id, uid: user?.uid));
+          BlocProvider.of<MoviesBloc>(context).add(GetWatchListItemEvent(
+              id: movieDetails.id, uid: user?.uid, mediaType: MediaType.MOVIE));
           return BlocBuilder(
             bloc: BlocProvider.of<MoviesBloc>(context),
             builder: (BuildContext context, state) {
@@ -547,7 +504,9 @@ class WatchListButton extends StatelessWidget {
                       if (user != null) {
                         BlocProvider.of<MoviesBloc>(context).add(
                             DeleteWatchListMovieItem(
-                                movieId: movieDetails.id, uid: user.uid));
+                                movieId: movieDetails.id,
+                                uid: user?.uid,
+                                mediaType: MediaType.MOVIE));
                         Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               "${movieDetails.title} has been removed from watch list"),
@@ -588,7 +547,9 @@ class WatchListButton extends StatelessWidget {
                 onPressed: () {
                   if (user != null) {
                     BlocProvider.of<MoviesBloc>(context).add(AddWatchListEvent(
-                        movieDetails: movieDetails, uid: user.uid));
+                        movieDetails: movieDetails,
+                        uid: user?.uid,
+                        mediaType: MediaType.MOVIE));
                   } else {
                     showDialog(
                         useRootNavigator: true,

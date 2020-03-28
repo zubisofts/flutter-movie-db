@@ -54,9 +54,10 @@ class MyApp extends StatelessWidget {
           theme: value
               ? ThemeData(
                   brightness: Brightness.dark,
-                  fontFamily: "Serif",
+                  fontFamily: "Poppins-Regular",
+
                 )
-              : ThemeData(brightness: Brightness.light, fontFamily: "Serif")
+              : ThemeData(brightness: Brightness.light, fontFamily: "Poppins-Regular")
                   .copyWith(
                       primaryColor: Colors.orange, accentColor: Colors.orange),
           home: Home(),

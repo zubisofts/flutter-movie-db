@@ -1,4 +1,5 @@
 import 'package:MovieDB/model/tv_list_model.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:MovieDB/repository/tv_series_repository.dart';
 import 'package:MovieDB/widgets/tv_item_horizontal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,8 @@ import 'package:MovieDB/pages/watchlist_page.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:MovieDB/widgets/movie_item_vertical.dart';
+
+import 'loading_text_widget.dart';
 
 class TvListPage extends StatefulWidget {
   final int id;
@@ -37,7 +40,7 @@ class _TvListPageState extends State<TvListPage> {
   @override
   Widget build(BuildContext context) {
    if(widget.user!=null){
-      BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(uid: widget.user.uid));
+      BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(uid: widget.user.uid,mediaType: MediaType.TV));
    }
     return Scaffold(
         appBar: AppBar(
@@ -64,7 +67,7 @@ class _TvListPageState extends State<TvListPage> {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.data == null) {
               return Center(
-                child: CircularProgressIndicator(),
+                child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
               );
             }
             return TvListLayout(

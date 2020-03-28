@@ -9,6 +9,7 @@ import 'package:MovieDB/pages/movie_detail_page.dart';
 import 'package:MovieDB/repository/constants.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/custom_path_clipper.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MovieItemHorizontal extends StatelessWidget {
   const MovieItemHorizontal({
@@ -48,14 +49,22 @@ class MovieItemHorizontal extends StatelessWidget {
               // crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-                    flex: 6,
+                    flex: 5,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         imageUrl:movie.posterPath!=null? "${IMAGE_URL + movie.posterPath}":"",
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            Center(child: CircularProgressIndicator()),
+                            Center(child: Shimmer.fromColors(
+                              baseColor: Colors.grey[700],
+                              highlightColor: Colors.grey[600],
+                              child: Container(
+                                color: Colors.grey,
+                                width: 100,
+                                height: MediaQuery.of(context).size.height,
+                              ),
+                            )),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     )),
@@ -100,7 +109,7 @@ class MovieItemHorizontal extends StatelessWidget {
                                   await new MovieRepository()
                                       .getMovieDetails(movie.id);
                               _moviesBloc.add(AddWatchListEvent(
-                                  movieDetails: movieDetails, uid: user.uid));
+                                  movieDetails: movieDetails, uid: user.uid,mediaType: MediaType.MOVIE));
                             },
                             child: Container(
                               height: 50,
@@ -135,12 +144,12 @@ class MovieItemHorizontal extends StatelessWidget {
             onTap: () async {
               if (state.watchListItem != null) {
                 _moviesBloc.add(
-                    DeleteWatchListMovieItem(uid: user.uid, movieId: movie.id));
+                    DeleteWatchListMovieItem(uid: user.uid, movieId: movie.id,mediaType: MediaType.MOVIE));
               } else {
                 MovieDetails movieDetails =
                     await new MovieRepository().getMovieDetails(movie.id);
                 _moviesBloc.add(AddWatchListEvent(
-                    movieDetails: movieDetails, uid: user.uid));
+                    movieDetails: movieDetails, uid: user.uid,mediaType: MediaType.MOVIE));
               }
             },
             child: Container(

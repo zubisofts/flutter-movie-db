@@ -16,3 +16,5 @@ ThemeData getLightTheme(BuildContext context){
 ThemeData getDarkTheme(BuildContext context){
   return Theme.of(context).copyWith(brightness: Brightness.dark,primaryColor: Colors.blue,);
 }
+
+enum MediaType{MOVIE,TV}

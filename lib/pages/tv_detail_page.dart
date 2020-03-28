@@ -1,4 +1,10 @@
+import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
+import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
 import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
+import 'package:MovieDB/model/tv_list_model.dart';
+import 'package:MovieDB/pages/loading_text_widget.dart';
+import 'package:MovieDB/widgets/tv_last_episode_widget.dart';
 import 'package:MovieDB/model/tv_details.dart';
 import 'package:MovieDB/repository/tv_series_repository.dart';
 import 'package:MovieDB/widgets/trailers_row_widget.dart';
@@ -14,6 +20,7 @@ import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
 import 'package:MovieDB/widgets/auth_modal_form.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:getflutter/components/carousel/gf_carousel.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:MovieDB/model/credit.dart';
@@ -21,12 +28,12 @@ import 'package:MovieDB/model/movie_details.dart';
 import 'package:MovieDB/model/movie_images.dart';
 import 'package:MovieDB/pages/image_slide_screen.dart';
 import 'package:MovieDB/repository/constants.dart';
-import 'package:MovieDB/widgets/movie_cast_list.dart';
-
+import 'package:MovieDB/widgets/cast_list.dart';
 
 class TvDetailPage extends StatefulWidget {
   final int id;
   final FirebaseUser user;
+
   TvDetailPage({Key key, this.id, this.user}) : super(key: key);
 
   @override
@@ -35,28 +42,27 @@ class TvDetailPage extends StatefulWidget {
 
 class _TvDetailPageState extends State<TvDetailPage> {
   TvBloc _tvBloc = TvBloc();
+  MoviesBloc mBloc = MoviesBloc();
 
-  YoutubePlayerController _controller;
   int backdropindex = 0;
-  String videoId="iLnmTe5Q2Qw";
 
   @override
   void initState() {
     // _movieBloc.add(LoadMovieVideosEvent(id: widget.movie.id));
+//    print("ID:${widget.id}");
     _tvBloc.add(LoadTvDetailsEvent(id: widget.id));
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    
+
 // print(movie.genries);
     return Scaffold(
       // backgroundColor: Colors.white,
@@ -65,31 +71,15 @@ class _TvDetailPageState extends State<TvDetailPage> {
         builder: (BuildContext context, state) {
           if (state is TvLoadingState) {
             return Center(
-                child: SpinKitHourGlass(
-              color: Colors.greenAccent,
-            ));
+                child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",));
           }
           if (state is TvDetailsReadyState) {
             TvDetails tv = state.tvDetails;
             var videoDetails = state.videoDetails;
             Credit credit = state.credit;
 
-            // BlocProvider.of<MoviesBloc>(context)
-            //     .add(GetFavouriteEvent(id: movieDetails.id));
-//            var result = videoDetails.results.length > 0
-//                ? videoDetails.results[0]
-//                : null;
-//            // print(state.similarMovies);
-//            videoId='${result != null ? result.key : ""}';
-//            _controller = YoutubePlayerController(
-//              initialVideoId: videoId,
-//              flags: YoutubePlayerFlags(
-//                autoPlay: false,
-//                mute: false,
-//              ),
-//
-//            );
-//          var thumbnail =YoutubePlayer.getThumbnail(videoId: videoId,quality:ThumbnailQuality.standard);
+//            BlocProvider.of<MoviesBloc>(context)
+//                .add(GetFavouriteEvent(id: tv.id, mediaType: MediaType.TV));
             return CustomScrollView(
               physics: BouncingScrollPhysics(),
               slivers: <Widget>[
@@ -117,12 +107,12 @@ class _TvDetailPageState extends State<TvDetailPage> {
                     SizedBox(
                       width: 8,
                     ),
-//                    Container(
-//                      decoration: BoxDecoration(
-//                          color: Colors.black.withOpacity(0.3),
-//                          shape: BoxShape.circle),
-//                      child: FavouriteWidget(movieDetails: movieDetails),
-//                    )
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          shape: BoxShape.circle),
+                      child: FavouriteWidget(tvDetails: tv),
+                    )
                   ],
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
@@ -131,8 +121,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
                       Container(
                         height: screenSize.height,
                         width: screenSize.width,
-                        child: Center(
-                            child: _buildBackdropCarousel(tv.id)),
+                        child: Center(child: _buildBackdropCarousel(tv.id)),
                       ),
                       Positioned(
                         left: 0,
@@ -188,7 +177,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 32.0),
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
@@ -227,8 +216,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
 //                                                SizedBox(
 //                                                  width: 5,
 //                                                ),
-                                                Text(
-                                                    '${tv.voteAverage}'),
+                                                Text('${tv.voteAverage}'),
                                                 SizedBox(
                                                   width: 20,
                                                 ),
@@ -238,7 +226,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
                                                 ),
                                                 Expanded(
                                                   child: Text(
-                                                      '${tv.firstAirDate}'),
+                                                      '${tv.firstAirDate.day}-${tv.firstAirDate.month}-${tv.firstAirDate.year}'),
                                                 ),
                                               ],
                                             ),
@@ -251,8 +239,12 @@ class _TvDetailPageState extends State<TvDetailPage> {
                                         fit: BoxFit.cover,
                                         width: 100,
                                         height: 130,
-                                        placeholder: (context, url) => Center(
-                                            child: CircularProgressIndicator()),
+                                        placeholder: (
+                                            context, url) => Center(
+                                            child: Shimmer.fromColors(child: Container(
+                                              width: 100,
+                                              height: 130,
+                                            ), baseColor: Colors.grey[600], highlightColor: Colors.grey[700])),
                                         errorWidget: (context, url, error) =>
                                             Icon(Icons.error),
                                       ),
@@ -261,74 +253,68 @@ class _TvDetailPageState extends State<TvDetailPage> {
                                   SizedBox(
                                     height: 10,
                                   ),
-//                                  WatchListButton(
-//                                    movieDetails: movieDetails,
-//                                  ),
+                                  WatchListButton(
+                                    details: tv,
+                                  ),
                                   SizedBox(
                                     height: 30,
                                   ),
 
                                   Text(
-                                    "About Movie",
+                                    "Overview",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                                   ),
 
                                   SizedBox(
                                     height: 8,
                                   ),
                                   // ReadMoreText('${movieDetails.overview}',expandingButtonColor: Theme.of(context).accentColor,),
-                                  Text('${tv.overview}'),
+                                  Text(
+                                    '${tv.overview}',
+                                    style: TextStyle(height: 1.5),
+                                  ),
 
                                   SizedBox(
                                     height: 30,
                                   ),
 
-                                  Text(
-                                    "Movie Trailers",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-
+                                  TvLastEpisodeWidget(
+                                      tv: tv, screenSize: screenSize),
                                   SizedBox(
-                                    height: 10,
+                                    height: 30,
                                   ),
-                                  
-                                  Container(
-                                    height: 200,
-                                    // width: 350,
-                                    margin: EdgeInsets.only(bottom: 20.0),
-                                    child: TrailersVideoRow(videos:videoDetails.results),
-                                    // height: 200,
 
-                                    // width: screenSize.width,
-
-                                    // child: YoutubePlayer(
-                                    //   controller: _controller,
-                                    //   showVideoProgressIndicator: true,
-                                    //   onEnded: (c){
-                                    //     _controller.reload();
-                                    //   },
-                                    //   onReady: () {
-                                    //     // print('ready');
-
-                                    //     _controller.addListener(() {});
-                                    //   },
-                                    //   progressColors: ProgressBarColors(
-                                    //     playedColor: Colors.amber,
-                                    //     handleColor: Colors.amberAccent,
-                                    //   ),
-                                    // ),
-                                  ),
                                 ],
                               ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:16.0),
+                              child: Text(
+                                "Trailer Videos",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
+
+                            SizedBox(
+                              height: 10,
+                            ),
+
+                            Container(
+                              height: 200,
+                              // width: 350,
+                              margin: EdgeInsets.only(bottom: 20.0),
+                              child: TrailersVideoRow(
+                                  videos: videoDetails.results),
                             ),
                             SizedBox(
                               height: 20,
                             ),
-                            MovieCastList(
+                            CastList(
                               title: "Cast",
                               credit: credit,
                             ),
@@ -336,11 +322,11 @@ class _TvDetailPageState extends State<TvDetailPage> {
                               height: 20,
                             ),
 
-                             TvListRow(
-                               title: "Similar Movies",
-                               type: TvCat.Similar,
-                               id: tv.id,
-                             ),
+                            TvListRow(
+                              title: "Similar Shows",
+                              type: TvCat.Similar,
+                              id: tv.id,
+                            ),
 //                            MovieReviewWidget(movieDetails: movieDetails,)
                           ],
                         ),
@@ -413,202 +399,187 @@ class _TvDetailPageState extends State<TvDetailPage> {
     );
   }
 }
-//
-//class FavouriteWidget extends StatelessWidget {
-//  const FavouriteWidget({
-//    Key key,
-//    @required this.movieDetails,
-//  }) : super(key: key);
-//
-//  final MovieDetails movieDetails;
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
-//    return BlocBuilder<AuthBloc, AuthState>(
-//      bloc: BlocProvider.of<AuthBloc>(context),
-//      builder: (BuildContext context, state) {
-//        if (state is AuthLoginState) {
-////          print("Auth State");
-//          FirebaseUser user = state.user;
-//          MovieDetails fav;
-//          MoviesBloc mBloc = MoviesBloc();
-//          mBloc.add(GetFavouriteEvent(uid: user?.uid, id: movieDetails.id));
-//          return BlocBuilder(
-//            bloc: mBloc,
-//            builder: (BuildContext context, state) {
-//              if (state is FavouriteItemState) {
-//                // print(state.favourite.title);
-//                fav = state.favourite;
-//                return IconButton(
-//                  onPressed: () {
-//                    if (user != null) {
-//                      if (state.favourite != null) {
-//                        mBloc.add(DeleteFavouriteMovieItem(
-//                            movieId: movieDetails.id, uid: user.uid));
-//                      } else {
-//                        mBloc.add(AddFavouritesEvent(
-//                            movieDetails: movieDetails, uid: user.uid));
-//                      }
-//                    } else {
-//                      showDialog(
-//                          useRootNavigator: true,
-//                          barrierDismissible: true,
-//                          context: context,
-//                          builder: (BuildContext context) {
-//                            return Dialog(
-//                              child: AuthModalForm(),
-//                              shape: RoundedRectangleBorder(
-//                                  borderRadius: BorderRadius.circular(3)),
-//                            );
-//                          });
-//                    }
-//                  },
-//                  icon: Icon(
-//                    Icons.favorite,
-//                    color: state.favourite != null ? Colors.red : Colors.white,
-//                  ),
-//                );
-//              }
-//
-//              // return SizedBox.shrink();
-//
-//              return IconButton(
-//                onPressed: () {
-//                  if (user != null) {
-//                    mBloc.add(AddFavouritesEvent(
-//                        movieDetails: movieDetails, uid: user.uid));
-//                  } else {
-//                    showDialog(
-//                        useRootNavigator: true,
-//                        barrierDismissible: true,
-//                        context: context,
-//                        builder: (BuildContext context) {
-//                          return Dialog(
-//                            child: AuthModalForm(),
-//                            shape: RoundedRectangleBorder(
-//                                borderRadius: BorderRadius.circular(3)),
-//                          );
-//                        });
-//                  }
-//                },
-//                icon: Icon(Icons.favorite),
-//              );
-//            },
-//          );
-//        }
-//
-//        return SizedBox.shrink();
-//      },
-//    );
-//  }
-//}
-//
-//class WatchListButton extends StatelessWidget {
-//  final MovieDetails movieDetails;
-//  const WatchListButton({
-//    Key key,
-//    this.movieDetails,
-//  }) : super(key: key);
-//
-//  @override
-//  Widget build(BuildContext context) {
-////    MoviesBloc _moviesBloc = BlocProvider.of<MoviesBloc>(context);
-//    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
-//
-//    return BlocBuilder<AuthBloc, AuthState>(
-//      bloc: BlocProvider.of<AuthBloc>(context),
-//      builder: (BuildContext context, AuthState state) {
-//        if (state is AuthLoginState) {
-//          var user = state.user;
-//          BlocProvider.of<MoviesBloc>(context)
-//              .add(GetWatchListItemEvent(id: movieDetails.id, uid: user?.uid));
-//          return BlocBuilder(
-//            bloc: BlocProvider.of<MoviesBloc>(context),
-//            builder: (BuildContext context, state) {
-//              if (state is WatchListItem) {
-//                if (state.watchListItem != null) {
-//                  return MaterialButton(
-//                    padding: EdgeInsets.symmetric(vertical: 16.0),
-//                    textColor: Theme.of(context).canvasColor,
-//                    color: Theme.of(context).accentColor,
-//                    onPressed: () {
-//                      if (user != null) {
-//                        BlocProvider.of<MoviesBloc>(context).add(
-//                            DeleteWatchListMovieItem(
-//                                movieId: movieDetails.id, uid: user.uid));
-//                        Scaffold.of(context).showSnackBar(SnackBar(
-//                          content: Text(
-//                              "${movieDetails.title} has been removed from watch list"),
-//                        ));
-//                      } else {
-//                        showDialog(
-//                            useRootNavigator: true,
-//                            barrierDismissible: true,
-//                            context: context,
-//                            builder: (BuildContext context) {
-//                              return Dialog(
-//                                child: AuthModalForm(),
-//                                shape: RoundedRectangleBorder(
-//                                    borderRadius: BorderRadius.circular(3)),
-//                              );
-//                            });
-//                      }
-//                    },
-//                    child: Row(
-//                      crossAxisAlignment: CrossAxisAlignment.center,
-//                      mainAxisAlignment: MainAxisAlignment.center,
-//                      children: <Widget>[
-//                        Icon(Icons.delete),
-//                        SizedBox(
-//                          width: 16,
-//                        ),
-//                        Center(child: Text("Remove from Watch List")),
-//                      ],
-//                    ),
-//                  );
-//                }
-//              }
-//
-//              return MaterialButton(
-//                padding: EdgeInsets.symmetric(vertical: 16.0),
-//                textColor: Theme.of(context).canvasColor,
-//                color: Theme.of(context).accentColor,
-//                onPressed: () {
-//                  if (user != null) {
-//                    BlocProvider.of<MoviesBloc>(context).add(AddWatchListEvent(
-//                        movieDetails: movieDetails, uid: user.uid));
-//                  } else {
-//                    showDialog(
-//                        useRootNavigator: true,
-//                        barrierDismissible: true,
-//                        context: context,
-//                        builder: (BuildContext context) {
-//                          return Dialog(
-//                            child: AuthModalForm(),
-//                            shape: RoundedRectangleBorder(
-//                                borderRadius: BorderRadius.circular(3)),
-//                          );
-//                        });
-//                  }
-//                },
-//                child: Row(
-//                  crossAxisAlignment: CrossAxisAlignment.center,
-//                  mainAxisAlignment: MainAxisAlignment.center,
-//                  children: <Widget>[
-//                    Icon(Icons.add),
-//                    SizedBox(
-//                      width: 16,
-//                    ),
-//                    Center(child: Text("Add to Watch List")),
-//                  ],
-//                ),
-//              );
-//            },
-//          );
-//        }
-//        return SizedBox.shrink();
-//      },
-//    );
-//  }
-//}
+
+class FavouriteWidget extends StatelessWidget {
+  const FavouriteWidget({
+    Key key,
+    @required this.tvDetails,
+  }) : super(key: key);
+
+  final TvDetails tvDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
+    return BlocBuilder<AuthBloc, AuthState>(
+      bloc: BlocProvider.of<AuthBloc>(context),
+      builder: (BuildContext context, state) {
+        if (state is AuthLoginState) {
+          print("Auth State");
+          FirebaseUser user = state.user;
+          MoviesBloc mBloc = MoviesBloc();
+          mBloc.add(GetFavouriteEvent(uid: user.uid, id: tvDetails.id,mediaType: MediaType.TV));
+          return BlocBuilder<MoviesBloc,MoviesState>(
+            bloc: mBloc,
+            builder: (BuildContext context, state) {
+              if (state is FavouriteItemState) {
+                // print(state.favourite.title);
+                print("dfhchkvbknl/n;m:");
+
+                return IconButton(
+                  onPressed: () {
+                    if (user != null) {
+                      if (state.favourite != null) {
+                        print("Calling delete");
+                        mBloc.add(DeleteFavouriteMovieItem(
+                            movieId: tvDetails.id, uid: user.uid,mediaType: MediaType.TV));
+                      } else {
+                        print("Calling Add");
+                        mBloc.add(AddFavouritesEvent(
+                            details: tvDetails, uid: user.uid,mediaType: MediaType.TV));
+                      }
+                    } else {
+                      showDialog(
+                          useRootNavigator: true,
+                          barrierDismissible: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: AuthModalForm(),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3)),
+                            );
+                          });
+                    }
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color: state.favourite != null ? Colors.red : Colors.white,
+                  ),
+                );
+              }
+
+              // return SizedBox.shrink();
+
+              return IconButton(
+                onPressed: () {
+                  if (user != null) {
+                    print("Calling Adding 2");
+                    mBloc.add(AddFavouritesEvent(
+
+                        details: tvDetails, uid: user.uid,mediaType: MediaType.TV));
+                  } else {
+                    showDialog(
+                        useRootNavigator: true,
+                        barrierDismissible: true,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog(
+                            child: AuthModalForm(),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3)),
+                          );
+                        });
+                  }
+                },
+                icon: Icon(Icons.favorite),
+              );
+            },
+          );
+        }
+
+        return SizedBox.shrink();
+      },
+    );
+  }
+}
+
+class WatchListButton extends StatelessWidget {
+  final details;
+
+  const WatchListButton({
+    Key key,
+    this.details,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    MoviesBloc _moviesBloc = BlocProvider.of<MoviesBloc>(context);
+    BlocProvider.of<AuthBloc>(context).add(ListenToLoginEvent());
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      bloc: BlocProvider.of<AuthBloc>(context),
+      builder: (BuildContext context, AuthState state) {
+        if (state is AuthLoginState) {
+          var user = state.user;
+          _moviesBloc.add(GetWatchListItemEvent(id: details.id, uid: user?.uid,mediaType: MediaType.TV));
+          return BlocBuilder(
+            bloc: _moviesBloc,
+            builder: (BuildContext context, state) {
+              if (state is WatchListItem) {
+                print("Watchlist yielded");
+                return MaterialButton(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  textColor: Theme
+                      .of(context)
+                      .canvasColor,
+                  color: Theme
+                      .of(context)
+                      .accentColor,
+                  onPressed: () {
+                    if (user != null) {
+                      if (state.watchListItem != null) {
+                        _moviesBloc.add(
+                            DeleteWatchListMovieItem(
+                                movieId: details.id,
+                                uid: user.uid,
+                                mediaType: MediaType.TV));
+                      } else {
+                        _moviesBloc.add(
+                            AddWatchListEvent(
+                                movieDetails: details,
+                                uid: user.uid,
+                                mediaType: MediaType.TV));
+                      }
+                    } else {
+                      showDialog(
+                          useRootNavigator: true,
+                          barrierDismissible: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: AuthModalForm(),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3)),
+                            );
+                          });
+                    }
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(state.watchListItem != null ?Icons.delete:Icons.add),
+                      SizedBox(
+                        width: 16,
+                      ),
+                      Center(child: state.watchListItem == null ? Text(
+                          "Add to Watch List") : Text(
+                          "Remove from Watch List")),
+                    ],
+                  ),
+                );
+              }
+              return SizedBox.shrink();
+            },
+
+          );
+
+        }
+        return SizedBox.shrink();
+      },
+    );
+  }
+}
+
+

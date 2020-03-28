@@ -2,49 +2,50 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:MovieDB/model/genre.dart';
 import 'package:MovieDB/model/movie_review.dart';
 import 'package:MovieDB/model/tv_details.dart';
 import 'package:MovieDB/model/tv_list_model.dart';
+import 'package:MovieDB/model/tv_season_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:MovieDB/model/credit.dart';
 import 'package:MovieDB/model/movie_details.dart';
-import 'package:MovieDB/model/movie_images.dart';
-import 'package:MovieDB/model/movie_list.dart' as movieResult;
-import 'package:MovieDB/model/movie_list.dart';
 import 'package:MovieDB/model/person.dart';
 import 'package:MovieDB/model/person_images.dart';
 import 'package:MovieDB/model/video_details.dart' as videoResult;
 import 'package:MovieDB/repository/constants.dart';
 import 'package:http/http.dart' as http;
 
-enum MovieCat { Popular, NowPlaying, Upcoming, TopRated, Similar, Search }
+enum TvCat { AiringToday, OnTheAir,Latest, Popular, TopRated, Similar, Search }
 
-class MovieRepository {
-  // FirebaseAuth _auth = FirebaseAuth.instance;
+class TVRepository {
+  FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userReference =
       Firestore.instance.collection("flutter_ui_challenge");
   String uid;
 
-  MovieRepository();
+  TVRepository();
 
-  MovieRepository.withUID(String id) {
+  TVRepository.withUID(String id) {
     this.uid = id;
   }
 
-  Future<dynamic> getMovies(MovieCat type, int id, int pageIndex) async {
+  Future<Tv> getTvShows(TvCat type, int id, int pageIndex) async {
     String cat = "";
 
-    if (type == MovieCat.NowPlaying) {
-      cat = "now_playing";
-    } else if (type == MovieCat.Popular) {
+    if (type == TvCat.AiringToday) {
+      cat = "airing_today";
+    } else if (type == TvCat.OnTheAir) {
+      cat = "on_the_air";
+    } else if (type == TvCat.Popular) {
       cat = "popular";
-    } else if (type == MovieCat.TopRated) {
+    }else if (type == TvCat.Latest) {
+      cat = "latest";
+    } else if (type == TvCat.TopRated) {
       cat = "top_rated";
-    } else if (type == MovieCat.Similar) {
+    } else if (type == TvCat.Similar) {
       cat = "$id/similar";
 //      print("$cat");
     } else {
@@ -52,18 +53,18 @@ class MovieRepository {
     }
     String url = "";
     try {
-      if (type == MovieCat.Similar) {
-        url = '$MOVIE_BASE_URL$cat?api_key=$API_KEY';
+      if (type == TvCat.Similar) {
+        url = '$TV_BASE_URL$cat?api_key=$API_KEY';
       } else {
-        url = '$MOVIE_BASE_URL$cat?api_key=$API_KEY&page=$pageIndex';
+        url = '$TV_BASE_URL$cat?api_key=$API_KEY&page=$pageIndex';
       }
       // String url ='https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341';
       // String url="https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341";
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
-      var content = json.decode(res.body);
+//      var content = json.decode(res.body);
 
-      movieResult.MovieList movieList = movieResult.MovieList.fromJson(content);
+      var tv = tvFromJson(res.body);
       // print(movieList.toJson());
       // List data = content['results'];
       // int page=content['page'];
@@ -72,99 +73,78 @@ class MovieRepository {
       // print(_moviesFromJson(data));
       // return _moviesFromJson(data,page);
 
-      return movieList;
+      return tv;
     } catch (ex) {
       print(ex.message);
       return null;
     }
   }
 
-  Future<dynamic> searchMovie(String query) async {
+  Future<Tv> searchTv(String query) async {
     try {
       String url =
-          'https://api.themoviedb.org/3/search/movie?api_key=$API_KEY&language=en-US&query=$query&include_adult=false';
+          '${TMDB_URL}search/tv?api_key=$API_KEY&language=en-US&query=$query&include_adult=false';
       // print(url);
       // String url ='https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341';
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
 
-      movieResult.MovieList movieList = movieResult.MovieList.fromJson(content);
+      var tv=tvFromJson(content);
 
-      return movieList;
+      return tv;
     } catch (ex) {
       print(ex.message);
       return null;
     }
   }
 
-  Future<dynamic> discover(String sortString, List<int> genreIds,String y, MediaType mediaType,int pageIndex) async {
-    String media=mediaType==MediaType.MOVIE?'movie':'tv';
-    String sortQuery=sortString==''?'':'&sort_by=$sortString';
-    String genres='';
-    String year=y==''?'':'&year=$y';
-    if(genreIds.length>0){
-      genreIds.forEach((f){
-        genres+='$f ';
-      });
-      genres='&with_genres=$genres';
-    }
-    String url='${TMDB_URL}discover/$media?api_key=$API_KEY&language=en-US$sortQuery$year$genres';
-    // print(url);
+  Future<Credit> getTvCredits(int id) async {
     try {
-      var res = await http
-          .get(Uri.encodeFull(url), headers: {'accept': 'application/json'},);
-      var content = json.decode(res.body);
-
-print(res.request.url);
-      return mediaType==MediaType.MOVIE? movieResult.MovieList.fromJson(content):tvFromJson(res.body);
-
-    } catch (ex) {
-      print(ex.message);
-      return null;
-    }
-  }
-
-  Future<List<Results>> getMovieCredits(int id) async {
-    try {
-      String url = TMDB_URL + "person/$id/movie_credits?api_key=$API_KEY";
+      String url = TMDB_URL + "tv/$id/credits?api_key=$API_KEY";
       // print(url);
       // String url ='https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341';
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
-      List list = content['cast'];
-      var movieList = list.map((f) => Results.fromJson(f)).toList();
+//      print(content);
 
-      return movieList;
+      return Credit.fromJson(content);
+//      List list = content['cast'];
+//      var movieList = list.map((f) => Results.fromJson(f)).toList();
+//
+//      return movieList;
     } catch (ex) {
-      print(ex.message);
+      print("TvCredits$ex.message");
       return null;
     }
   }
 
-  Future<MovieImages> getMovieImages(int id) async {
+  Future<TvSeasonDetails> getTvSeasonDetails(int id,int number) async {
     try {
-      String url = "$MOVIE_BASE_URL$id/images?api_key=$API_KEY";
+      String url = TMDB_URL + "tv/$id/season/$number?api_key=$API_KEY";
       // print(url);
-      // String url ='https://api.themoviedb.org/3/movie/530915/images?api_key=3189670a5af406da03f513c311f29341';
+      // String url ='https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341';
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
-      var content = json.decode(res.body);
-//      print(res.body);
-      var movieImages = MovieImages.fromMap(content);
+//      var content = json.decode(res.body);
+//      print(content);
 
-      return movieImages;
+      return tvSeasonDetailsFromJson(res.body);
+//      List list = content['cast'];
+//      var movieList = list.map((f) => Results.fromJson(f)).toList();
+//
+//      return movieList;
     } catch (ex) {
-      print(ex);
+      print("TvCredits$ex.message");
       return null;
     }
   }
 
-  Future<dynamic> getMovieDetails(int id, {int page = 1}) async {
+  Future<dynamic> getTvDetails(int id, {int page = 1}) async {
+
     try {
-      String url = MOVIE_BASE_URL + '$id?api_key=$API_KEY&page=$page';
-      // String url="https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341";
+      String url = TMDB_URL + 'tv/$id?api_key=$API_KEY&page=$page';
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
@@ -172,94 +152,43 @@ print(res.request.url);
       // print(content);
       // print(_moviesFromJson(data));
       // print(MovieDetails.fromJson(content).genres.map((f) => f.name));
-      return MovieDetails.fromJson(content);
+//      print(res.body);
+      return tvDetailsFromJson(res.body);
     } catch (ex) {
-      print(ex.message);
+      print("TvDetails$ex.message");
       // return ex.message;
       return null;
     }
   }
 
-
-
-  Future<videoResult.VideoDetails> getVideos(int id,
-      {int type, int sn, int epn}) async {
+  Future<dynamic> getTvVideos(int id) async {
     try {
-      String url;
-      if (type == 1) {
-        url = TMDB_URL + "tv/$id/season/$sn/videos?api_key=" + API_KEY;
-      } else if (type == 2) {
-        url = TMDB_URL +
-            "tv/$id/season/$sn/episode/$epn/videos?api_key=" +
-            API_KEY;
-      } else {
-        url = MOVIE_BASE_URL + "$id/videos?api_key=" + API_KEY;
-      }
-
-//      String url = MOVIE_BASE_URL + "$id" + "/videos?api_key=" + API_KEY;
+      String url = TMDB_URL + "tv/$id" + "/videos?api_key=" + API_KEY;
       // String url="https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341";
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
-      // List data = content['results'];
-      print(url);
-      // print(_moviesFromJson(data));
-      // print(VideoDetails.fromJson(content).results.map((f) => f.name));
+//      print(content);
       return videoResult.VideoDetails.fromJson(content);
     } catch (ex) {
-      print(ex.message);
+      print("TvVideos$ex.message");
       // return ex.message;
       return null;
     }
   }
 
-  Future<Credit> getCredits(int id, {int type, int sn, int epn}) async {
+  Future<dynamic> getMovieCast(int id) async {
     try {
-      String url;
-      if (type == 1) {
-        url = TMDB_URL + "tv/$id/season/$sn/credits?api_key=" + API_KEY;
-      } else if (type == 2) {
-        url = TMDB_URL +
-            "tv/$id/season/$sn/episode/$epn/credits?api_key=" +
-            API_KEY;
-      } else {
-        url = MOVIE_BASE_URL + "$id/credits?api_key=" + API_KEY;
-      }
-      // String url="https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341";
+      String url = TMDB_URL + "/tv$id/credits?api_key=" + API_KEY;
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
       // List data = content['results'];
-//       print(url);
+      // print(content);
       // print(_moviesFromJson(data));
       // print(Credit.fromJson(content));
 
       return Credit.fromJson(content);
-    } catch (ex) {
-      print(ex.message);
-      // return ex.message;
-      return null;
-    }
-  }
-
-  Future<Genry> getGenres(MediaType type) async {
-    try {
-      String url;
-      if(type==MediaType.MOVIE) {
-        url= "${TMDB_URL}genre/movie/list?api_key=" + API_KEY;
-    }else{
-        url= "${TMDB_URL}genre/tv/list?api_key=" + API_KEY;
-      }
-      var res = await http
-          .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
-      var content = json.decode(res.body);
-      // List data = content['results'];
-//       print(url);
-//       print(content);
-      // print(_moviesFromJson(data));
-      // print(Credit.fromJson(content));
-
-      return Genry.fromMap(content);
     } catch (ex) {
       print(ex.message);
       // return ex.message;
@@ -295,7 +224,7 @@ print(res.request.url);
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
       // List data = content['results'];
-      print(url);
+//      print(url);
       return PersonImages.fromJson(content);
     } catch (ex) {
       print(ex.message);
@@ -331,126 +260,95 @@ print(res.request.url);
     // Share.text(title,"hdfjhil","text");
   }
 
-  Future<void> addToWatchList(
-      dynamic movieDetails, MediaType mediaType) async {
-    print('Watchlist=${movieDetails.id}');
+  Future<void> addToWatchList(MovieDetails movieDetails) async {
     return await userReference
         .document("data")
-        .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('watch_list')
         .collection(uid)
         .document('${movieDetails.id}')
-        .setData({'${movieDetails.id}':mediaType==MediaType.MOVIE? movieDetails.toJson():tvDetailsToMap(movieDetails)});
+        .setData({'${movieDetails.id}': movieDetails.toJson()});
   }
 
-  Future<void> addToFavorites(dynamic details, MediaType mediaType) async {
-//    print(details);
+  Future<void> addToFavorites(MovieDetails movieDetails) async {
     return await userReference
         .document("data")
-        .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('favourites')
         .collection(uid)
-        .document('${details.id}')
-        .setData({
-      '${details.id}': mediaType == MediaType.MOVIE
-          ? details.toJson()
-          : tvDetailsToMap(details)
-    });
+        .document('${movieDetails.id}')
+        .setData({'${movieDetails.id}': movieDetails.toJson()});
   }
 
-  Stream<List> favourites(MediaType mediaType) {
+  Stream<List<MovieDetails>> get favourites {
     return userReference
         .document("data")
-        .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('favourites')
         .collection(uid)
         .snapshots()
-        .map(mediaType == MediaType.MOVIE
-            ? _mapMovieDocumentToData
-            : _mapTvDocumentToData);
+        .map(_mapDocumentToData);
   }
 
-  Stream<List> watchlist(MediaType mediaType) {
+  Stream<List<MovieDetails>> get watchlist {
     return userReference
         .document("data")
-        .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('watch_list')
         .collection(uid)
         .snapshots()
-        .map(mediaType == MediaType.MOVIE
-            ? _mapMovieDocumentToData
-            : _mapTvDocumentToData);
+        .map(_mapDocumentToData);
   }
 
-  Stream getFavourite(int movieId, MediaType mediaType) {
+  Stream<MovieDetails> getFavourite(int movieId) {
     return userReference
         .document("data")
-        .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('favourites')
         .collection(uid)
         .document('$movieId')
         .snapshots()
-        .map((doc) {
-      if (doc.exists) {
-        print(TvDetails.fromMap(doc.data['${doc.documentID}']).name);
-        return mediaType == MediaType.MOVIE
+        .map((doc) => doc.exists
             ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : TvDetails.fromMap(doc.data['${doc.documentID}']);
-      } else {
-        return null;
-      }
-    });
+            : null);
   }
 
-  Stream getWatchListItem(int mediaId, MediaType mediaType) {
+  Stream<MovieDetails> getWatchListItem(int movieId) {
     return userReference
         .document("data")
-        .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('watch_list')
         .collection(uid)
-        .document('$mediaId')
+        .document('$movieId')
         .snapshots()
-        .map((doc) {
-      if (doc.exists) {
-        return mediaType == MediaType.MOVIE
+        .map((doc) => doc.exists
             ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : tvDetailsFromMap(doc.data['${doc.documentID}']);
-      } else {
-        return null;
-      }
-    });
-
+            : null);
   }
 
-  Future<void> removeFavoritesItem(int id, MediaType mediaType) async {
+  Future<void> removeFavoritesItem(int id) async {
     return await userReference
         .document("data")
-        .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('favourites')
         .collection(uid)
         .document('$id')
         .delete();
   }
 
-  Future<void> removeWatchListItem(int id, MediaType mediaType) async {
+  Future<void> removeWatchListItem(int id) async {
     return await userReference
         .document("data")
-        .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .collection("movies_data")
+        .document('watch_list')
         .collection(uid)
         .document('$id')
         .delete();
   }
 
-  List _mapMovieDocumentToData(QuerySnapshot snapshot) {
+  List<MovieDetails> _mapDocumentToData(QuerySnapshot snapshot) {
     return snapshot.documents
         .map((doc) => MovieDetails.fromJson(doc.data[doc.documentID]))
-        .toList();
-  }
-
-  List _mapTvDocumentToData(QuerySnapshot snapshot) {
-    return snapshot.documents
-        .map((doc) => TvDetails.fromMap(doc.data[doc.documentID]))
         .toList();
   }
 

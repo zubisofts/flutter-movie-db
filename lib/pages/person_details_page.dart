@@ -1,3 +1,4 @@
+import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -53,7 +54,7 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
             if (state is MovieLoadingState) {
               return Center(
                 child:
-                    SpinKitRotatingCircle(color: Theme.of(context).accentColor),
+                LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
               );
             }
 

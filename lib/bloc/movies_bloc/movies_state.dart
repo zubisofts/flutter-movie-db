@@ -1,4 +1,6 @@
+import 'package:MovieDB/model/genre.dart';
 import 'package:MovieDB/model/movie_review.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:equatable/equatable.dart';
 import 'package:MovieDB/model/credit.dart';
 import 'package:MovieDB/model/favourite.dart';
@@ -101,7 +103,7 @@ class PersonImagesState extends MoviesState {
 }
 
 class FavouritesState extends MoviesState {
-  final List<Favourite> favourites;
+  final List favourites;
 
   FavouritesState({
     this.favourites,
@@ -112,7 +114,7 @@ class FavouritesState extends MoviesState {
 }
 
 class FavouriteItemState extends MoviesState {
-  final MovieDetails favourite;
+  final favourite;
 
   FavouriteItemState({
     this.favourite,
@@ -123,7 +125,7 @@ class FavouriteItemState extends MoviesState {
 }
 
 class FavouriteMoviesLoaded extends MoviesState {
-  final List<MovieDetails> favourites;
+  final List favourites;
 
   FavouriteMoviesLoaded({
     this.favourites,
@@ -144,7 +146,7 @@ class FavouriteMoviesLoaded extends MoviesState {
 // }
 
 class WatchListItem extends MoviesState {
-  final MovieDetails watchListItem;
+  final watchListItem;
 
   WatchListItem({
     this.watchListItem,
@@ -155,14 +157,16 @@ class WatchListItem extends MoviesState {
 }
 
 class WatchListMoviesLoaded extends MoviesState {
-  final List<MovieDetails> watchList;
+  final List watchList;
+  final MediaType mediaType;
 
   WatchListMoviesLoaded({
     this.watchList,
+    this.mediaType
   });
 
   @override
-  List<Object> get props => [watchList];
+  List<Object> get props => [watchList,mediaType];
 }
 
 class MovieErrorState extends MoviesState {
@@ -177,4 +181,25 @@ class MovieReviewsLoaded extends MoviesState {
 
   @override
   List<Object> get props => [movieReview];
+}
+class GenresState extends MoviesState {
+  final Genry genry;
+
+GenresState({
+    this.genry,
+  });
+
+  @override
+  List<Object> get props => [genry];
+}
+
+class DiscoverState extends MoviesState {
+  final dynamic items;
+
+DiscoverState({
+    this.items,
+  });
+
+  @override
+  List<Object> get props => [items];
 }

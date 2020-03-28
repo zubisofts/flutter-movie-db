@@ -1,3 +1,4 @@
+import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
 import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
 import 'package:MovieDB/model/tv_list_model.dart';
 import 'package:MovieDB/pages/tv_detail_page.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MovieDB/repository/constants.dart';
 import 'package:MovieDB/widgets/custom_path_clipper.dart';
+import 'package:shimmer/shimmer.dart';
 
 class TvItemHorizontal extends StatelessWidget {
   const TvItemHorizontal({
@@ -20,8 +22,8 @@ class TvItemHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TvBloc _tvBloc = TvBloc();
-    print("${tv.id}");
+    MoviesBloc _movieBloc = MoviesBloc();
+//    print("${tv.id}");
 //    _moviesBloc.add(GetWatchListItemEvent(id: movie.id, uid: user?.uid));
     return Container(
       margin: EdgeInsets.all(8.0),
@@ -47,14 +49,22 @@ class TvItemHorizontal extends StatelessWidget {
               // crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-                    flex: 6,
+                    flex: 5,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         imageUrl:tv.posterPath!=null? "${IMAGE_URL + tv.posterPath}":"",
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            Center(child: CircularProgressIndicator()),
+                            Center(child: Shimmer.fromColors(
+                              baseColor: Colors.grey[700],
+                              highlightColor: Colors.grey[600],
+                              child: Container(
+                                color: Colors.grey,
+                                width: 100,
+                                height: MediaQuery.of(context).size.height,
+                              ),
+                            )),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     )),
@@ -86,11 +96,11 @@ class TvItemHorizontal extends StatelessWidget {
               ],
             ),
             user != null
-                ? BlocBuilder<TvBloc, TvState>(
-                    bloc: _tvBloc,
-                    builder: (BuildContext context, TvState state) {
+                ? BlocBuilder<MoviesBloc, MoviesState>(
+                    bloc: _movieBloc,
+                    builder: (BuildContext context, MoviesState state) {
                       if (state is WatchListItem) {
-                        return buildWatchListTag(state, _tvBloc, context);
+                        return buildWatchListTag(state, _movieBloc, context);
                       }
                       return ClipPath(
                           child: InkWell(
@@ -127,7 +137,7 @@ class TvItemHorizontal extends StatelessWidget {
   }
 
   Widget buildWatchListTag(
-      WatchListItem state, TvBloc tvBloc, BuildContext context) {
+      WatchListItem state, MoviesBloc moviesBloc, BuildContext context) {
     return Container(
       child: ClipPath(
           child: InkWell(

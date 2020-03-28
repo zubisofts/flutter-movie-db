@@ -44,29 +44,41 @@ class _HomeState extends State<Home> {
         elevation: 0,
         backgroundColor: Theme.of(context).canvasColor,
         textTheme: Theme.of(context).textTheme,
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          onPressed: () {
-            buildShowModalBottomSheet(context);
-          },
-        ),
+//        leading: IconButton(
+//          icon: Icon(
+//            Icons.menu,
+//            color: Theme.of(context).iconTheme.color,
+//          ),
+//          onPressed: () {
+//            buildShowModalBottomSheet(context);
+//          },
+//        ),
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            Text("[",
+                style: TextStyle(
+                    color: Theme.of(context).accentColor,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Poppins-Bold")),
             Text("Movie",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,fontFamily: "Poppins-Bold")),
             Text("DB",
                 style: TextStyle(
                     color: Theme.of(context).accentColor,
                     fontSize: 26,
-                    fontWeight: FontWeight.bold)),
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Poppins-Bold")),
+            Text("]",
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Poppins-Bold")),
           ],
         ),
-        centerTitle: true,
+//        centerTitle: true,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),

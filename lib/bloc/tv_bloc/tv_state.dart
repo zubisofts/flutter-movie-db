@@ -30,10 +30,10 @@ class TvLoadedState extends TvState {
   List<Object> get props => [tvs];
 }
 
-class MoreMoviesLoadedState extends TvState {
+class MoreTvLoadedState extends TvState {
   final Tv tvs;
 
-  MoreMoviesLoadedState({
+  MoreTvLoadedState({
     this.tvs,
   });
 
@@ -46,18 +46,6 @@ class TvErrorState extends TvState{
   List<Object> get props => [];
 
 }
-
-class WatchListItem extends TvState{
-
-  final Result watchListItem;
-
-  WatchListItem({this.watchListItem});
-
-  @override
-  List<Object> get props => [watchListItem];
-
-}
-
 
 class TvDetailsReadyState extends TvState {
   final TvDetails tvDetails;
@@ -74,4 +62,14 @@ class TvDetailsReadyState extends TvState {
 
   @override
   List<Object> get props => [tvDetails, videoDetails, similarTvs,credit];
+}
+
+class TvSeasonDetailsState extends TvState {
+  final TvSeasonDetails tvSeasonDetails;
+  TvSeasonDetailsState({
+    this.tvSeasonDetails
+  });
+
+  @override
+  List<Object> get props => [tvSeasonDetails];
 }

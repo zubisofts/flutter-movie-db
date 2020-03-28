@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:MovieDB/model/credit.dart';
 import 'package:MovieDB/pages/movie_credits_page.dart';
-import 'package:MovieDB/widgets/movie_cast_item.dart';
+import 'package:MovieDB/widgets/cast_item.dart';
 
-class MovieCastList extends StatefulWidget {
+class CastList extends StatefulWidget {
   final String title;
   final Credit credit;
 
-  MovieCastList({Key key, this.title, this.credit}) : super(key: key);
+  CastList({Key key, this.title, this.credit}) : super(key: key);
 
   @override
   _MovieCastList createState() => _MovieCastList();
 }
 
-class _MovieCastList extends State<MovieCastList> {
+class _MovieCastList extends State<CastList> {
   // List<Cast> cast= widget.credit.cast;
 
   @override
