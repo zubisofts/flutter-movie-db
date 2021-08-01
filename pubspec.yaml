@@ -20,8 +20,9 @@ dependencies:
   flutter:
     sdk: flutter
   # google_fonts: ^0.3.3
-  cloud_firestore: ^0.13.4
-  firebase_auth: ^0.15.4
+  firebase_core : ^0.5.0
+  firebase_auth: ^0.18.0+1
+  cloud_firestore: ^0.14.0+2
   bloc:
   flutter_bloc:
   equatable:
@@ -36,9 +37,9 @@ dependencies:
   google_sign_in: ^4.1.4
   flutter_facebook_login: ^3.0.0
   esys_flutter_share:
-  flutter_slidable: ^0.5.4
+  flutter_slidable:
   shimmer: ^1.1.0
-  getflutter: ^1.0.9
+  getwidget:
 #  extended_text: ^0.7.1
   # provider: ^4.0.1
 

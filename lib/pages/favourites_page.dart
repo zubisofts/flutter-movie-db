@@ -209,7 +209,7 @@ class _MovieListTileState extends State<MovieListTile> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: CachedNetworkImage(
-                    imageUrl: "${IMAGE_URL + widget.movieDetails.posterPath}",
+                    imageUrl: widget.movieDetails.posterPath != null ? "${IMAGE_URL + widget.movieDetails.posterPath}" : IMAGE_TEMP_URL,
                     fit: BoxFit.cover,
                     width: 70,
                     height: 85,

@@ -12,8 +12,7 @@ class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
   MovieRepository movieRespository = MovieRepository();
   StreamSubscription _movieDbSubscription;
 
-  @override
-  MoviesState get initialState => InitialMoviesState();
+  MoviesBloc() : super(InitialMoviesState());
 
   @override
   Stream<MoviesState> mapEventToState(

@@ -8,10 +8,10 @@ import 'package:MovieDB/fragments/movies_category.dart';
 
 import 'package:MovieDB/pages/favourites_page.dart';
 import 'package:MovieDB/pages/watchlist_page.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
   ProfileScreen({
     Key key,
     this.user,
@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: GFAvatar(
               shape: GFAvatarShape.circle,
               radius: 45,
-              backgroundImage: NetworkImage(widget.user.photoUrl),
+              backgroundImage: NetworkImage(widget.user.photoURL),
             ),
           ),
           SizedBox(

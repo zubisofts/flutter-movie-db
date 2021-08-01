@@ -4,7 +4,8 @@ import 'package:MovieDB/model/movie_review.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
+// import 'package:getflutter/getflutter.dart';
 
 class MovieReviewWidget extends StatefulWidget {
   final MovieDetails movieDetails;
@@ -30,7 +31,7 @@ class _MovieReviewWidgetState extends State<MovieReviewWidget> {
 //    print("Id:${movieDetails.id}");
     return GFAccordion(
       title: "Reviews",
-      contentbackgroundColor: Theme.of(context).canvasColor,
+      contentBackgroundColor:Theme.of(context).canvasColor,
       textStyle: TextStyle(
           color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
       collapsedIcon: Icon(

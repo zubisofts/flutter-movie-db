@@ -91,7 +91,7 @@ class _HomeState extends State<Home> {
             bloc: BlocProvider.of<AuthBloc>(context),
             builder: (BuildContext context, state) {
               if (state is AuthLoginState) {
-                FirebaseUser user = state.user;
+                User user = state.user;
                 // print("object ${user.email}");
 
                 return IconButton(
@@ -157,14 +157,14 @@ class _HomeState extends State<Home> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.movie), title: Text("Movies")),
+              icon: Icon(Icons.movie), label: "Movies"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.live_tv), title: Text("TV Series")),
+              icon: Icon(Icons.live_tv), label: "TV Series"),
           BottomNavigationBarItem(
               icon: Icon(MaterialIcons.open_in_browser),
-              title: Text("Discover")),
+              label: "Discover"),
           BottomNavigationBarItem(
-              icon: Icon(FontAwesome.newspaper_o), title: Text("News"))
+              icon: Icon(FontAwesome.newspaper_o), label: "News")
         ],
       ),
       // floatingActionButton: _currentPageIndex == 3

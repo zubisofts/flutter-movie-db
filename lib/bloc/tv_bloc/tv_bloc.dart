@@ -16,8 +16,7 @@ part 'tv_state.dart';
 class TvBloc extends Bloc<TvEvent, TvState> {
   TVRepository tvRepository = TVRepository();
 
-  @override
-  TvState get initialState => TvInitial();
+  TvBloc() : super(TvInitial());
 
   @override
   Stream<TvState> mapEventToState(
@@ -45,7 +44,6 @@ class TvBloc extends Bloc<TvEvent, TvState> {
     yield TvLoadingState();
 
     var tvs = await tvRepository.getTvShows(type, id, currentPageIndex);
-    // print(type);
 
     if (tvs != null) {
       yield TvLoadedState(tvs: tvs);

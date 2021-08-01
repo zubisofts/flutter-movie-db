@@ -12,7 +12,7 @@ import 'package:MovieDB/pages/movie_detail_page.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
 
 class WatchListPage extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
 
   WatchListPage({
     Key key,

@@ -14,8 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   StreamSubscription _authSubscription;
 
-  @override
-  AuthState get initialState => InitialAuthState();
+  AuthBloc() : super(InitialAuthState());
 
   @override
   Stream<AuthState> mapEventToState(

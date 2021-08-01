@@ -13,7 +13,7 @@ import 'package:MovieDB/widgets/auth_modal_form.dart';
 
 class MovieItemVertical extends StatelessWidget {
   final Results movie;
-  final FirebaseUser user;
+  final User user;
 
   MovieItemVertical({Key key, this.movie, this.user})
       : super(key: key);
@@ -49,7 +49,7 @@ class MovieItemVertical extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: movie.posterPath != null
                           ? "${IMAGE_URL + movie.posterPath}"
-                          : "assets/images/no-image.jpg",
+                          : IMAGE_TEMP_URL,
                       fit: BoxFit.cover,
                       width: 70,
                       height: 85,

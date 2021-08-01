@@ -26,13 +26,13 @@ enum MovieCat { Popular, NowPlaying, Upcoming, TopRated, Similar, Search }
 class MovieRepository {
   // FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userReference =
-      Firestore.instance.collection("flutter_ui_challenge");
+      FirebaseFirestore.instance.collection("flutter_ui_challenge");
   String uid;
 
   MovieRepository();
 
   MovieRepository.withUID(String id) {
-    this.uid = id;
+    this.uid = id==null ? 'empty':id;
   }
 
   Future<dynamic> getMovies(MovieCat type, int id, int pageIndex) async {
@@ -98,27 +98,32 @@ class MovieRepository {
     }
   }
 
-  Future<dynamic> discover(String sortString, List<int> genreIds,String y, MediaType mediaType,int pageIndex) async {
-    String media=mediaType==MediaType.MOVIE?'movie':'tv';
-    String sortQuery=sortString==''?'':'&sort_by=$sortString';
-    String genres='';
-    String year=y==''?'':'&year=$y';
-    if(genreIds.length>0){
-      genreIds.forEach((f){
-        genres+='$f ';
+  Future<dynamic> discover(String sortString, List<int> genreIds, String y,
+      MediaType mediaType, int pageIndex) async {
+    String media = mediaType == MediaType.MOVIE ? 'movie' : 'tv';
+    String sortQuery = sortString == '' ? '' : '&sort_by=$sortString';
+    String genres = '';
+    String year = y == '' ? '' : '&year=$y';
+    if (genreIds.length > 0) {
+      genreIds.forEach((f) {
+        genres += '$f ';
       });
-      genres='&with_genres=$genres';
+      genres = '&with_genres=$genres';
     }
-    String url='${TMDB_URL}discover/$media?api_key=$API_KEY&language=en-US$sortQuery$year$genres';
+    String url =
+        '${TMDB_URL}discover/$media?api_key=$API_KEY&language=en-US$sortQuery$year$genres';
     // print(url);
     try {
-      var res = await http
-          .get(Uri.encodeFull(url), headers: {'accept': 'application/json'},);
+      var res = await http.get(
+        Uri.encodeFull(url),
+        headers: {'accept': 'application/json'},
+      );
       var content = json.decode(res.body);
 
-print(res.request.url);
-      return mediaType==MediaType.MOVIE? movieResult.MovieList.fromJson(content):tvFromJson(res.body);
-
+      print(res.request.url);
+      return mediaType == MediaType.MOVIE
+          ? movieResult.MovieList.fromJson(content)
+          : tvFromJson(res.body);
     } catch (ex) {
       print(ex.message);
       return null;
@@ -179,8 +184,6 @@ print(res.request.url);
       return null;
     }
   }
-
-
 
   Future<videoResult.VideoDetails> getVideos(int id,
       {int type, int sn, int epn}) async {
@@ -245,10 +248,10 @@ print(res.request.url);
   Future<Genry> getGenres(MediaType type) async {
     try {
       String url;
-      if(type==MediaType.MOVIE) {
-        url= "${TMDB_URL}genre/movie/list?api_key=" + API_KEY;
-    }else{
-        url= "${TMDB_URL}genre/tv/list?api_key=" + API_KEY;
+      if (type == MediaType.MOVIE) {
+        url = "${TMDB_URL}genre/movie/list?api_key=" + API_KEY;
+      } else {
+        url = "${TMDB_URL}genre/tv/list?api_key=" + API_KEY;
       }
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
@@ -331,27 +334,30 @@ print(res.request.url);
     // Share.text(title,"hdfjhil","text");
   }
 
-  Future<void> addToWatchList(
-      dynamic movieDetails, MediaType mediaType) async {
+  Future<void> addToWatchList(dynamic movieDetails, MediaType mediaType) async {
     print('Watchlist=${movieDetails.id}');
     return await userReference
-        .document("data")
+        .doc("data")
         .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('${movieDetails.id}')
-        .setData({'${movieDetails.id}':mediaType==MediaType.MOVIE? movieDetails.toJson():tvDetailsToMap(movieDetails)});
+        .doc('${movieDetails.id}')
+        .set({
+      '${movieDetails.id}': mediaType == MediaType.MOVIE
+          ? movieDetails.toJson()
+          : tvDetailsToMap(movieDetails)
+    });
   }
 
   Future<void> addToFavorites(dynamic details, MediaType mediaType) async {
 //    print(details);
     return await userReference
-        .document("data")
+        .doc("data")
         .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('${details.id}')
-        .setData({
+        .doc('${details.id}')
+        .set({
       '${details.id}': mediaType == MediaType.MOVIE
           ? details.toJson()
           : tvDetailsToMap(details)
@@ -360,9 +366,9 @@ print(res.request.url);
 
   Stream<List> favourites(MediaType mediaType) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
         .snapshots()
         .map(mediaType == MediaType.MOVIE
@@ -372,9 +378,9 @@ print(res.request.url);
 
   Stream<List> watchlist(MediaType mediaType) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
         .snapshots()
         .map(mediaType == MediaType.MOVIE
@@ -384,18 +390,18 @@ print(res.request.url);
 
   Stream getFavourite(int movieId, MediaType mediaType) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('$movieId')
+        .doc('$movieId')
         .snapshots()
         .map((doc) {
       if (doc.exists) {
-        print(TvDetails.fromMap(doc.data['${doc.documentID}']).name);
+        // print(TvDetails.fromMap(doc.data['${doc.id}']).name);
         return mediaType == MediaType.MOVIE
-            ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : TvDetails.fromMap(doc.data['${doc.documentID}']);
+            ? MovieDetails.fromJson(doc.data())
+            : TvDetails.fromMap(doc.data());
       } else {
         return null;
       }
@@ -404,54 +410,51 @@ print(res.request.url);
 
   Stream getWatchListItem(int mediaId, MediaType mediaType) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('$mediaId')
+        .doc('$mediaId')
         .snapshots()
         .map((doc) {
       if (doc.exists) {
         return mediaType == MediaType.MOVIE
-            ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : tvDetailsFromMap(doc.data['${doc.documentID}']);
+            ? MovieDetails.fromJson(doc.data())
+            : tvDetailsFromMap(doc.data());
       } else {
         return null;
       }
     });
-
   }
 
   Future<void> removeFavoritesItem(int id, MediaType mediaType) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection('favourites')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('$id')
+        .doc('$id')
         .delete();
   }
 
   Future<void> removeWatchListItem(int id, MediaType mediaType) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection('watch_list')
-        .document(mediaType == MediaType.MOVIE ? "movie" : "tv")
+        .doc(mediaType == MediaType.MOVIE ? "movie" : "tv")
         .collection(uid)
-        .document('$id')
+        .doc('$id')
         .delete();
   }
 
   List _mapMovieDocumentToData(QuerySnapshot snapshot) {
-    return snapshot.documents
-        .map((doc) => MovieDetails.fromJson(doc.data[doc.documentID]))
+    return snapshot.docs
+        .map((doc) => MovieDetails.fromJson(doc.data()))
         .toList();
   }
 
   List _mapTvDocumentToData(QuerySnapshot snapshot) {
-    return snapshot.documents
-        .map((doc) => TvDetails.fromMap(doc.data[doc.documentID]))
-        .toList();
+    return snapshot.docs.map((doc) => TvDetails.fromMap(doc.data())).toList();
   }
 
   Future<MovieReview> getMovieReviews(int id) async {

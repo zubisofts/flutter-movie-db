@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
-import 'package:getflutter/components/carousel/gf_carousel.dart';
 
 import 'package:MovieDB/model/movie_images.dart';
 import 'package:MovieDB/repository/constants.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class ImageSlideScreen extends StatefulWidget {
@@ -143,7 +143,7 @@ class _ImageSlideScreenState extends State<ImageSlideScreen> {
       child: Hero(
         tag: "backdrop",
         child: CachedNetworkImage(
-          imageUrl: "${IMAGE_URL + backdrop.filePath}",
+          imageUrl:backdrop.filePath != null ? "${IMAGE_URL + backdrop.filePath}" : IMAGE_TEMP_URL,
           fit: BoxFit.cover,
           width: MediaQuery.of(context).size.width,
           placeholder: (context, url) =>

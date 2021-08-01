@@ -8,11 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
 
-import 'package:MovieDB/model/movie_list.dart';
 import 'package:MovieDB/pages/watchlist_page.dart';
-import 'package:MovieDB/repository/movie_repository.dart';
-import 'package:MovieDB/widgets/movie_item_horizontal.dart';
-import 'package:MovieDB/widgets/movie_item_vertical.dart';
 
 import 'loading_text_widget.dart';
 
@@ -20,7 +16,7 @@ class TvListPage extends StatefulWidget {
   final int id;
   final String title;
   final TvCat type;
-  final FirebaseUser user;
+  final User user;
 
   TvListPage({
     Key key,
@@ -39,15 +35,18 @@ class _TvListPageState extends State<TvListPage> {
 
   @override
   Widget build(BuildContext context) {
-   if(widget.user!=null){
-      BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(uid: widget.user.uid,mediaType: MediaType.TV));
-   }
+    if (widget.user != null) {
+      BlocProvider.of<MoviesBloc>(context).add(LoadWatchListMoviesEvent(
+          uid: widget.user.uid, mediaType: MediaType.TV));
+    }
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: isVertical ? Icon(Icons.grid_on) : Icon(Icons.list),
+              icon: isVertical
+                  ? Icon(Icons.grid_on)
+                  : Icon(Icons.list_alt_outlined),
               onPressed: () {
                 setState(() {
                   isVertical = !isVertical;
@@ -67,7 +66,11 @@ class _TvListPageState extends State<TvListPage> {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.data == null) {
               return Center(
-                child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",),
+                child: LoadingTextWidget(
+                  baseColor: Colors.red,
+                  highlightColor: Colors.yellow,
+                  text: "Loading...",
+                ),
               );
             }
             return TvListLayout(
@@ -93,12 +96,12 @@ class _TvListPageState extends State<TvListPage> {
                                 )));
                       },
                       icon: Icon(Icons.watch_later),
-                      label: Text('${state.watchList.length} ' + '${state.watchList.length>1?'items':'item'}'),
+                      label: Text('${state.watchList.length} ' +
+                          '${state.watchList.length > 1 ? 'items' : 'item'}'),
                     );
                   }
                   return SizedBox.shrink();
                 },
-
               )
             : SizedBox.shrink());
   }
@@ -109,7 +112,7 @@ class TvListLayout extends StatefulWidget {
   final TvCat type;
   final int id;
   final bool isVertical;
-  final FirebaseUser user;
+  final User user;
 
   TvListLayout(
       {Key key, this.tvList, this.type, this.id, this.isVertical, this.user})

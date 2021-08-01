@@ -15,7 +15,7 @@ class MoviesListPage extends StatefulWidget {
   final int id;
   final String title;
   final MovieCat type;
-  final FirebaseUser user;
+  final User user;
 
   MoviesListPage({
     Key key,
@@ -42,7 +42,7 @@ class _MoviesListPageState extends State<MoviesListPage> {
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: isVertical ? Icon(Icons.grid_on) : Icon(Icons.list),
+              icon: isVertical ? Icon(Icons.grid_on) : Icon(Icons.list_alt_outlined),
               onPressed: () {
                 setState(() {
                   isVertical = !isVertical;
@@ -104,7 +104,7 @@ class MovieListLayout extends StatefulWidget {
   final MovieCat type;
   final int id;
   final bool isVertical;
-  final FirebaseUser user;
+  final User user;
 
   MovieListLayout(
       {Key key, this.movieList, this.type, this.id, this.isVertical, this.user})

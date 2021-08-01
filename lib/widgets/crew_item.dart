@@ -38,7 +38,7 @@ class MovieCrewItem extends StatelessWidget {
                 child: Center(
                     child: crew.profilePath != null ?CircleAvatar(
                   backgroundImage:
-                      NetworkImage('${IMAGE_URL + crew.profilePath}'),
+                      NetworkImage(crew.profilePath != null ? '${IMAGE_URL + crew.profilePath}': IMAGE_TEMP_URL),
                   radius: 50,
                 ):CircleAvatar(child: Icon(Icons.person,size: 90,color: Colors.white24,),radius: 50,backgroundColor: Colors.grey,)
                 )

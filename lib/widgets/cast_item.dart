@@ -38,7 +38,7 @@ class MovieCastItem extends StatelessWidget {
                 child: Center(
                     child: cast.profilePath != null ?CircleAvatar(
                   backgroundImage:
-                      NetworkImage('${IMAGE_URL + cast.profilePath}'),
+                      NetworkImage(cast.profilePath != null ? '${IMAGE_URL + cast.profilePath}':IMAGE_TEMP_URL),
                   radius: 50,
                 ):CircleAvatar(child: Icon(Icons.person,size: 90,color: Colors.white24,),radius: 50,backgroundColor: Colors.grey,)
                 )

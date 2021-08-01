@@ -65,7 +65,7 @@ class TvLastEpisodeWidget extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: tv.posterPath != null
                       ? "${IMAGE_URL + tv.lastEpisodeToAir.stillPath}"
-                      : "",
+                      : IMAGE_TEMP_URL,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
                       Center(child: CircularProgressIndicator()),

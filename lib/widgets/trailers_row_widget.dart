@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:MovieDB/model/video_details.dart';
+import 'package:MovieDB/repository/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -39,7 +40,7 @@ class TrailersVideoRow extends StatelessWidget {
                     flex: 4,
                     child: Stack(children: [
                       Image.network(
-                        thumbnail,
+                        thumbnail ?? IMAGE_TEMP_URL,
                         width: 250,
                         fit: BoxFit.cover,
                       ),
@@ -84,7 +85,7 @@ class TrailersVideoRow extends StatelessWidget {
   void _showVideoDialog(BuildContext context, Results video) {
     showDialog(
         context: context,
-        child: BackdropFilter(
+        builder: (BuildContext context)=> BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
           child: SimpleDialog(
             title: Text(

@@ -11,12 +11,10 @@ part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
 
-  AppBloc(){
+  AppBloc() : super(AppInitial()){
     _getThemeValueEventToState();
   }
-  
-  @override
-  AppState get initialState => AppInitial();
+
 
   @override
   Stream<AppState> mapEventToState(

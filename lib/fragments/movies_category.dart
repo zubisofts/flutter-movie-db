@@ -21,7 +21,7 @@ class MainPage extends StatelessWidget {
         bloc: BlocProvider.of<AuthBloc>(context),
         builder: (BuildContext context, AuthState state) {
           if (state is AuthLoginState) {
-            FirebaseUser user=state.user;
+            User user=state.user;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,

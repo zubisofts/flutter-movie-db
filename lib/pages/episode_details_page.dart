@@ -54,7 +54,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                   child: CachedNetworkImage(
                     imageUrl: widget.episode.stillPath != null
                         ? "${IMAGE_URL + widget.episode.stillPath}"
-                        : "assets/images/no-image.jpg",
+                        : IMAGE_TEMP_URL,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Center(
                         child: SizedBox(

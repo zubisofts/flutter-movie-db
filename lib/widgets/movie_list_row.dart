@@ -10,13 +10,15 @@ import 'package:MovieDB/widgets/movie_item_horizontal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 class MovieListRow extends StatefulWidget {
   final String title;
   final MovieCat type;
   final int id;
-  final FirebaseUser user;
+  final User user;
 
-  MovieListRow({Key key, this.title, this.type, this.id,this.user}) : super(key: key);
+  MovieListRow({Key key, this.title, this.type, this.id, this.user})
+      : super(key: key);
 
   @override
   _MovieListRowState createState() => _MovieListRowState();
@@ -35,14 +37,13 @@ class _MovieListRowState extends State<MovieListRow> {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       margin: EdgeInsets.only(top: 8.0, bottom: 8.0),
       color: Theme.of(context).canvasColor,
       elevation: 4,
       child: Container(
         padding: EdgeInsets.only(top: 8, bottom: 8),
-        height: 300,
+        height: 320,
         // width: 200,
         // decoration: BoxDecoration(
         //   boxShadow: [
@@ -69,11 +70,11 @@ class _MovieListRowState extends State<MovieListRow> {
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => MoviesListPage(
-                            title: widget.title,
-                            id: widget.id,
-                            user:widget.user,
-                            type: widget.type,
-                          )));
+                                title: widget.title,
+                                id: widget.id,
+                                user: widget.user,
+                                type: widget.type,
+                              )));
                     },
                     borderRadius: BorderRadius.circular(16.0),
                     child: Container(
@@ -98,7 +99,7 @@ class _MovieListRowState extends State<MovieListRow> {
             Expanded(
               child: BlocBuilder<AuthBloc, AuthState>(
                 builder: (BuildContext context, state) {
-                  if (state is AuthLoginState){
+                  if (state is AuthLoginState) {
                     return buildMovieList();
                   }
                   return SizedBox.shrink();
@@ -116,23 +117,28 @@ class _MovieListRowState extends State<MovieListRow> {
       bloc: _moviesBloc,
       builder: (BuildContext context, MoviesState state) {
         if (state is MovieLoadingState) {
-          return Center(child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",));
+          return Center(
+              child: LoadingTextWidget(
+            baseColor: Colors.red,
+            highlightColor: Colors.yellow,
+            text: "Loading...",
+          ));
         }
 
         if (state is AuthErrorState) {
           return Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("An error occured!"),
-                  RaisedButton(
-                    child: Text("Retry"),
-                    onPressed: () =>
-                        _moviesBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                  )
-                ],
-              ));
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text("An error occured!"),
+              RaisedButton(
+                child: Text("Retry"),
+                onPressed: () => _moviesBloc
+                    .add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+              )
+            ],
+          ));
         }
 
         if (state is MoviesLoadedState) {
@@ -152,38 +158,41 @@ class _MovieListRowState extends State<MovieListRow> {
                 itemBuilder: (BuildContext context, int index) {
                   // print(movies[index].title);
                   // Movie movie=movies[index];
-                  return MovieItemHorizontal(movie: movies[index],user: widget.user,);
+                  return MovieItemHorizontal(
+                    movie: movies[index],
+                    user: widget.user,
+                  );
                 },
               );
             }
           } else {
             return Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Nothing was found!"),
-                    RaisedButton(
-                      child: Text("Retry"),
-                      onPressed: () =>
-                          _moviesBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                    )
-                  ],
-                ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("Nothing was found!"),
+                RaisedButton(
+                  child: Text("Retry"),
+                  onPressed: () => _moviesBloc
+                      .add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+                )
+              ],
+            ));
           }
         }
 
         return Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text("An error occured!"),
-                RaisedButton(
-                  child: Text("Retry"),
-                  onPressed: () =>
-                      _moviesBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                )
-              ],
-            ));
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("An error occured!"),
+            RaisedButton(
+              child: Text("Retry"),
+              onPressed: () => _moviesBloc
+                  .add(LoadMoviesEvent(id: widget.id, type: widget.type)),
+            )
+          ],
+        ));
       },
     );
   }

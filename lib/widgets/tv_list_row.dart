@@ -14,13 +14,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'tv_item_horizontal.dart';
+
 class TvListRow extends StatefulWidget {
   final String title;
   final TvCat type;
   final int id;
-  final FirebaseUser user;
+  final User user;
 
-  TvListRow({Key key, this.title, this.type, this.id,this.user}) : super(key: key);
+  TvListRow({Key key, this.title, this.type, this.id, this.user})
+      : super(key: key);
 
   @override
   _TvListRowState createState() => _TvListRowState();
@@ -39,14 +41,13 @@ class _TvListRowState extends State<TvListRow> {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       margin: EdgeInsets.only(top: 8.0, bottom: 8.0),
       color: Theme.of(context).canvasColor,
       elevation: 4,
       child: Container(
         padding: EdgeInsets.only(top: 8, bottom: 8),
-        height: 300,
+        height: 320,
         // width: 200,
         // decoration: BoxDecoration(
         //   boxShadow: [
@@ -73,11 +74,11 @@ class _TvListRowState extends State<TvListRow> {
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => TvListPage(
-                            title: widget.title,
-                            id: widget.id,
-                            user:widget.user,
-                            type: widget.type,
-                          )));
+                                title: widget.title,
+                                id: widget.id,
+                                user: widget.user,
+                                type: widget.type,
+                              )));
                     },
                     borderRadius: BorderRadius.circular(16.0),
                     child: Container(
@@ -102,7 +103,7 @@ class _TvListRowState extends State<TvListRow> {
             Expanded(
               child: BlocBuilder<AuthBloc, AuthState>(
                 builder: (BuildContext context, state) {
-                  if (state is AuthLoginState){
+                  if (state is AuthLoginState) {
                     return buildMovieList();
                   }
                   return SizedBox.shrink();
@@ -118,28 +119,41 @@ class _TvListRowState extends State<TvListRow> {
   Widget buildMovieList() {
     return BlocBuilder<TvBloc, TvState>(
       bloc: _tvBloc,
+      buildWhen: (previous, current) =>
+          current is TvLoadedState ||
+          current is TvLoadingState ||
+          current is TvErrorState,
       builder: (BuildContext context, TvState state) {
         if (state is TvLoadingState) {
           return Center(child: CircularProgressIndicator());
         }
 
-        if (state is AuthErrorState) {
+        if (state is TvErrorState) {
+          print('Error just occured:${state}');
           return Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("An error occured!"),
-                  RaisedButton(
-                    child: Text("Retry"),
-//                    onPressed: () =>
-//                        _tvBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                  )
-                ],
-              ));
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "An error occured!",
+              ),
+              TextButton(
+                  style: TextButton.styleFrom(backgroundColor: Colors.teal),
+                  child: Text(
+                    "Retry now",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () => _tvBloc.add(LoadTvEvent(
+                        type: widget.type,
+                        id: widget.id,
+                      )))
+            ],
+          ));
         }
 
         if (state is TvLoadedState) {
+          // print('TV Loaded State:${state}');
           var tvList = state.tvs;
           var tvs = tvList.results;
           if (tvs != null) {
@@ -157,38 +171,48 @@ class _TvListRowState extends State<TvListRow> {
                   // print(movies[index].title);
                   // Movie movie=movies[index];
 //                  return Text(tvs[index].name);
-                  return TvItemHorizontal(tv: tvs[index],user: widget.user,);
+                  return TvItemHorizontal(
+                    tv: tvs[index],
+                    user: widget.user,
+                  );
                 },
               );
             }
           } else {
             return Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Nothing was found!"),
-                    RaisedButton(
-                      child: Text("Retry"),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("Nothing was found!"),
+                RaisedButton(
+                  child: Text("Retry"),
 //                      onPressed: () =>
 //                          _moviesBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                    )
-                  ],
-                ));
+                )
+              ],
+            ));
           }
         }
 
         return Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text("An error occured!"),
-                RaisedButton(
-                  child: Text("Retry"),
-//                  onPressed: () =>
-//                      _tvBloc.add(LoadMoviesEvent(id: widget.id, type: widget.type)),
-                )
-              ],
-            ));
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "An error occured!",
+            ),
+            TextButton(
+                style: TextButton.styleFrom(backgroundColor: Colors.teal),
+                child: Text(
+                  "Retry now",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () => _tvBloc.add(LoadTvEvent(
+                      type: widget.type,
+                      id: widget.id,
+                    )))
+          ],
+        ));
       },
     );
   }

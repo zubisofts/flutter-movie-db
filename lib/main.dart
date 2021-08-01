@@ -1,4 +1,7 @@
 import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MovieDB/bloc/app_bloc/app_bloc.dart';
@@ -7,28 +10,35 @@ import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
 import 'package:MovieDB/pages/home.dart';
 // import 'package:google_fonts/google_fonts.dart';
 
-void main() => runApp(MultiBlocProvider(
-      providers: [
-        BlocProvider<AppBloc>(
-          create: (BuildContext context) => AppBloc(),
-        ),
-        BlocProvider<MoviesBloc>(
-          create: (BuildContext context) => MoviesBloc(),
-        ),
-        BlocProvider<TvBloc>(
-          create: (BuildContext context) => TvBloc(),
-        ),
-        BlocProvider<AuthBloc>(
-          create: (BuildContext context) => AuthBloc(),
-        )
-      ],
-      child: MyApp(),
-    )
-        // BlocProvider<AppBloc>(
-        //     child: MyApp(),
-        //     create: (context) => AppBloc(),
-        //   )
-        );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  EquatableConfig.stringify = kDebugMode;
+  // Bloc.observer = SimpleBlocObserver();
+  await Firebase.initializeApp();
+
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider<AppBloc>(
+        create: (BuildContext context) => AppBloc(),
+      ),
+      BlocProvider<MoviesBloc>(
+        create: (BuildContext context) => MoviesBloc(),
+      ),
+      BlocProvider<TvBloc>(
+        create: (BuildContext context) => TvBloc(),
+      ),
+      BlocProvider<AuthBloc>(
+        create: (BuildContext context) => AuthBloc(),
+      )
+    ],
+    child: MyApp(),
+  )
+      // BlocProvider<AppBloc>(
+      //     child: MyApp(),
+      //     create: (context) => AppBloc(),
+      //   )
+      );
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -55,9 +65,10 @@ class MyApp extends StatelessWidget {
               ? ThemeData(
                   brightness: Brightness.dark,
                   fontFamily: "Poppins-Regular",
-
                 )
-              : ThemeData(brightness: Brightness.light, fontFamily: "Poppins-Regular")
+              : ThemeData(
+                      brightness: Brightness.light,
+                      fontFamily: "Poppins-Regular")
                   .copyWith(
                       primaryColor: Colors.orange, accentColor: Colors.orange),
           home: Home(),

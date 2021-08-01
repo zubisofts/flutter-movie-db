@@ -18,18 +18,18 @@ import 'package:MovieDB/model/video_details.dart' as videoResult;
 import 'package:MovieDB/repository/constants.dart';
 import 'package:http/http.dart' as http;
 
-enum TvCat { AiringToday, OnTheAir,Latest, Popular, TopRated, Similar, Search }
+enum TvCat { AiringToday, OnTheAir, Latest, Popular, TopRated, Similar, Search }
 
 class TVRepository {
   FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userReference =
-      Firestore.instance.collection("flutter_ui_challenge");
+      FirebaseFirestore.instance.collection("flutter_ui_challenge");
   String uid;
 
   TVRepository();
 
   TVRepository.withUID(String id) {
-    this.uid = id;
+    this.uid = id == null ? 'empty' : id;
   }
 
   Future<Tv> getTvShows(TvCat type, int id, int pageIndex) async {
@@ -41,7 +41,7 @@ class TVRepository {
       cat = "on_the_air";
     } else if (type == TvCat.Popular) {
       cat = "popular";
-    }else if (type == TvCat.Latest) {
+    } else if (type == TvCat.Latest) {
       cat = "latest";
     } else if (type == TvCat.TopRated) {
       cat = "top_rated";
@@ -58,14 +58,13 @@ class TVRepository {
       } else {
         url = '$TV_BASE_URL$cat?api_key=$API_KEY&page=$pageIndex';
       }
-      // String url ='https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341';
-      // String url="https://api.themoviedb.org/3/movie/now_playing?api_key=3189670a5af406da03f513c311f29341";
+      // String url ='https://api.themoviedb.org/3/tv/popular?api_key=3189670a5af406da03f513c311f29341&page=1';
       var res = await http
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
 //      var content = json.decode(res.body);
 
       var tv = tvFromJson(res.body);
-      // print(movieList.toJson());
+      // debugPrint(res.body);
       // List data = content['results'];
       // int page=content['page'];
       // print('The page is $page');
@@ -74,8 +73,8 @@ class TVRepository {
       // return _moviesFromJson(data,page);
 
       return tv;
-    } catch (ex) {
-      print(ex.message);
+    } on HttpException catch (ex) {
+      print(ex);
       return null;
     }
   }
@@ -90,7 +89,7 @@ class TVRepository {
           .get(Uri.encodeFull(url), headers: {'accept': 'application/json'});
       var content = json.decode(res.body);
 
-      var tv=tvFromJson(content);
+      var tv = tvFromJson(content);
 
       return tv;
     } catch (ex) {
@@ -120,7 +119,7 @@ class TVRepository {
     }
   }
 
-  Future<TvSeasonDetails> getTvSeasonDetails(int id,int number) async {
+  Future<TvSeasonDetails> getTvSeasonDetails(int id, int number) async {
     try {
       String url = TMDB_URL + "tv/$id/season/$number?api_key=$API_KEY";
       // print(url);
@@ -142,7 +141,6 @@ class TVRepository {
   }
 
   Future<dynamic> getTvDetails(int id, {int page = 1}) async {
-
     try {
       String url = TMDB_URL + 'tv/$id?api_key=$API_KEY&page=$page';
       var res = await http
@@ -262,93 +260,89 @@ class TVRepository {
 
   Future<void> addToWatchList(MovieDetails movieDetails) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('watch_list')
+        .doc('watch_list')
         .collection(uid)
-        .document('${movieDetails.id}')
-        .setData({'${movieDetails.id}': movieDetails.toJson()});
+        .doc('${movieDetails.id}')
+        .set({'${movieDetails.id}': movieDetails.toJson()});
   }
 
   Future<void> addToFavorites(MovieDetails movieDetails) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('favourites')
+        .doc('favourites')
         .collection(uid)
-        .document('${movieDetails.id}')
-        .setData({'${movieDetails.id}': movieDetails.toJson()});
+        .doc('${movieDetails.id}')
+        .set({'${movieDetails.id}': movieDetails.toJson()});
   }
 
   Stream<List<MovieDetails>> get favourites {
     return userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('favourites')
+        .doc('favourites')
         .collection(uid)
         .snapshots()
-        .map(_mapDocumentToData);
+        .map(_mapdocToData);
   }
 
   Stream<List<MovieDetails>> get watchlist {
     return userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('watch_list')
+        .doc('watch_list')
         .collection(uid)
         .snapshots()
-        .map(_mapDocumentToData);
+        .map(_mapdocToData);
   }
 
   Stream<MovieDetails> getFavourite(int movieId) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('favourites')
+        .doc('favourites')
         .collection(uid)
-        .document('$movieId')
+        .doc('$movieId')
         .snapshots()
-        .map((doc) => doc.exists
-            ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : null);
+        .map((doc) => doc.exists ? MovieDetails.fromJson(doc.data()) : null);
   }
 
   Stream<MovieDetails> getWatchListItem(int movieId) {
     return userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('watch_list')
+        .doc('watch_list')
         .collection(uid)
-        .document('$movieId')
+        .doc('$movieId')
         .snapshots()
-        .map((doc) => doc.exists
-            ? MovieDetails.fromJson(doc.data['${doc.documentID}'])
-            : null);
+        .map((doc) => doc.exists ? MovieDetails.fromJson(doc.data()) : null);
   }
 
   Future<void> removeFavoritesItem(int id) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('favourites')
+        .doc('favourites')
         .collection(uid)
-        .document('$id')
+        .doc('$id')
         .delete();
   }
 
   Future<void> removeWatchListItem(int id) async {
     return await userReference
-        .document("data")
+        .doc("data")
         .collection("movies_data")
-        .document('watch_list')
+        .doc('watch_list')
         .collection(uid)
-        .document('$id')
+        .doc('$id')
         .delete();
   }
 
-  List<MovieDetails> _mapDocumentToData(QuerySnapshot snapshot) {
-    return snapshot.documents
-        .map((doc) => MovieDetails.fromJson(doc.data[doc.documentID]))
+  List<MovieDetails> _mapdocToData(QuerySnapshot snapshot) {
+    return snapshot.docs
+        .map((doc) => MovieDetails.fromJson(doc.data()))
         .toList();
   }
 

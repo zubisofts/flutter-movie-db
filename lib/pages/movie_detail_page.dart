@@ -6,15 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:MovieDB/bloc/auth_bloc/auth_bloc.dart';
 import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
-import 'package:MovieDB/pages/sign_in_page.dart';
 import 'package:MovieDB/widgets/auth_modal_form.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
-import 'package:getflutter/components/carousel/gf_carousel.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:getwidget/getwidget.dart';
 
 import 'package:MovieDB/bloc/movies_bloc/bloc.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
@@ -27,11 +23,10 @@ import 'package:MovieDB/repository/movie_repository.dart';
 import 'package:MovieDB/widgets/movie_list_row.dart';
 import 'package:MovieDB/widgets/cast_list.dart';
 
-import 'movie_list_page.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final int id;
-  final FirebaseUser user;
+  final User user;
   MovieDetailPage({Key key, this.id, this.user}) : super(key: key);
 
   @override
@@ -225,7 +220,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                       ),
                                       CachedNetworkImage(
                                         imageUrl:
-                                            "${IMAGE_URL + movieDetails.posterPath}",
+                                           movieDetails.posterPath != null ? "${IMAGE_URL + movieDetails.posterPath}":IMAGE_TEMP_URL,
                                         fit: BoxFit.cover,
                                         width: 100,
                                         height: 130,
@@ -363,7 +358,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         child: CachedNetworkImage(
           imageUrl: backdrop.filePath != null
               ? "${IMAGE_URL + backdrop.filePath}"
-              : "assets/images/no-image.jpg",
+              : IMAGE_TEMP_URL,
           fit: BoxFit.cover,
           width: MediaQuery.of(context).size.width,
           placeholder: (context, url) =>
@@ -391,7 +386,7 @@ class FavouriteWidget extends StatelessWidget {
       builder: (BuildContext context, state) {
         if (state is AuthLoginState) {
 //          print("Auth State");
-          FirebaseUser user = state.user;
+          User user = state.user;
           MovieDetails fav;
           MoviesBloc mBloc = MoviesBloc();
           mBloc.add(GetFavouriteEvent(

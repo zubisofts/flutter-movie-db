@@ -2,7 +2,6 @@ import 'package:MovieDB/bloc/movies_bloc/movies_bloc.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_event.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
 import 'package:MovieDB/bloc/tv_bloc/tv_bloc.dart';
-import 'package:MovieDB/model/tv_list_model.dart';
 import 'package:MovieDB/pages/loading_text_widget.dart';
 import 'package:MovieDB/widgets/tv_last_episode_widget.dart';
 import 'package:MovieDB/model/tv_details.dart';
@@ -14,17 +13,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:MovieDB/bloc/auth_bloc/auth_bloc.dart';
 import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
 import 'package:MovieDB/widgets/auth_modal_form.dart';
 import 'package:MovieDB/repository/movie_repository.dart';
-import 'package:getflutter/components/carousel/gf_carousel.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:MovieDB/model/credit.dart';
-import 'package:MovieDB/model/movie_details.dart';
 import 'package:MovieDB/model/movie_images.dart';
 import 'package:MovieDB/pages/image_slide_screen.dart';
 import 'package:MovieDB/repository/constants.dart';
@@ -32,7 +28,7 @@ import 'package:MovieDB/widgets/cast_list.dart';
 
 class TvDetailPage extends StatefulWidget {
   final int id;
-  final FirebaseUser user;
+  final User user;
 
   TvDetailPage({Key key, this.id, this.user}) : super(key: key);
 
@@ -71,7 +67,11 @@ class _TvDetailPageState extends State<TvDetailPage> {
         builder: (BuildContext context, state) {
           if (state is TvLoadingState) {
             return Center(
-                child: LoadingTextWidget(baseColor: Colors.red,highlightColor: Colors.yellow,text: "Loading...",));
+                child: LoadingTextWidget(
+              baseColor: Colors.red,
+              highlightColor: Colors.yellow,
+              text: "Loading...",
+            ));
           }
           if (state is TvDetailsReadyState) {
             TvDetails tv = state.tvDetails;
@@ -235,16 +235,19 @@ class _TvDetailPageState extends State<TvDetailPage> {
                                       ),
                                       CachedNetworkImage(
                                         imageUrl:
-                                            "${IMAGE_URL + tv.posterPath}",
+                                           tv.posterPath != null ? "${IMAGE_URL + tv.posterPath}":IMAGE_TEMP_URL,
                                         fit: BoxFit.cover,
                                         width: 100,
                                         height: 130,
-                                        placeholder: (
-                                            context, url) => Center(
-                                            child: Shimmer.fromColors(child: Container(
-                                              width: 100,
-                                              height: 130,
-                                            ), baseColor: Colors.grey[600], highlightColor: Colors.grey[700])),
+                                        placeholder: (context, url) => Center(
+                                            child: Shimmer.fromColors(
+                                                child: Container(
+                                                  width: 100,
+                                                  height: 130,
+                                                ),
+                                                baseColor: Colors.grey[600],
+                                                highlightColor:
+                                                    Colors.grey[700])),
                                         errorWidget: (context, url, error) =>
                                             Icon(Icons.error),
                                       ),
@@ -286,17 +289,16 @@ class _TvDetailPageState extends State<TvDetailPage> {
                                   SizedBox(
                                     height: 30,
                                   ),
-
                                 ],
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:16.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Text(
                                 "Trailer Videos",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
+                                    fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             ),
 
@@ -388,7 +390,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
         child: CachedNetworkImage(
           imageUrl: backdrop.filePath != null
               ? "${IMAGE_URL + backdrop.filePath}"
-              : "assets/images/no-image.jpg",
+              : IMAGE_TEMP_URL,
           fit: BoxFit.cover,
           width: MediaQuery.of(context).size.width,
           placeholder: (context, url) =>
@@ -416,10 +418,13 @@ class FavouriteWidget extends StatelessWidget {
       builder: (BuildContext context, state) {
         if (state is AuthLoginState) {
           print("Auth State");
-          FirebaseUser user = state.user;
+          User user = state.user;
           MoviesBloc mBloc = MoviesBloc();
-          mBloc.add(GetFavouriteEvent(uid: user.uid, id: tvDetails.id,mediaType: MediaType.TV));
-          return BlocBuilder<MoviesBloc,MoviesState>(
+          mBloc.add(GetFavouriteEvent(
+              uid: user != null ? user.uid : 'empty',
+              id: tvDetails.id,
+              mediaType: MediaType.TV));
+          return BlocBuilder<MoviesBloc, MoviesState>(
             bloc: mBloc,
             builder: (BuildContext context, state) {
               if (state is FavouriteItemState) {
@@ -432,11 +437,15 @@ class FavouriteWidget extends StatelessWidget {
                       if (state.favourite != null) {
                         print("Calling delete");
                         mBloc.add(DeleteFavouriteMovieItem(
-                            movieId: tvDetails.id, uid: user.uid,mediaType: MediaType.TV));
+                            movieId: tvDetails.id,
+                            uid: user.uid,
+                            mediaType: MediaType.TV));
                       } else {
                         print("Calling Add");
                         mBloc.add(AddFavouritesEvent(
-                            details: tvDetails, uid: user.uid,mediaType: MediaType.TV));
+                            details: tvDetails,
+                            uid: user.uid,
+                            mediaType: MediaType.TV));
                       }
                     } else {
                       showDialog(
@@ -466,8 +475,9 @@ class FavouriteWidget extends StatelessWidget {
                   if (user != null) {
                     print("Calling Adding 2");
                     mBloc.add(AddFavouritesEvent(
-
-                        details: tvDetails, uid: user.uid,mediaType: MediaType.TV));
+                        details: tvDetails,
+                        uid: user.uid,
+                        mediaType: MediaType.TV));
                   } else {
                     showDialog(
                         useRootNavigator: true,
@@ -512,7 +522,8 @@ class WatchListButton extends StatelessWidget {
       builder: (BuildContext context, AuthState state) {
         if (state is AuthLoginState) {
           var user = state.user;
-          _moviesBloc.add(GetWatchListItemEvent(id: details.id, uid: user?.uid,mediaType: MediaType.TV));
+          _moviesBloc.add(GetWatchListItemEvent(
+              id: details.id, uid: user?.uid, mediaType: MediaType.TV));
           return BlocBuilder(
             bloc: _moviesBloc,
             builder: (BuildContext context, state) {
@@ -520,26 +531,20 @@ class WatchListButton extends StatelessWidget {
                 print("Watchlist yielded");
                 return MaterialButton(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
-                  textColor: Theme
-                      .of(context)
-                      .canvasColor,
-                  color: Theme
-                      .of(context)
-                      .accentColor,
+                  textColor: Theme.of(context).canvasColor,
+                  color: Theme.of(context).accentColor,
                   onPressed: () {
                     if (user != null) {
                       if (state.watchListItem != null) {
-                        _moviesBloc.add(
-                            DeleteWatchListMovieItem(
-                                movieId: details.id,
-                                uid: user.uid,
-                                mediaType: MediaType.TV));
+                        _moviesBloc.add(DeleteWatchListMovieItem(
+                            movieId: details.id,
+                            uid: user.uid,
+                            mediaType: MediaType.TV));
                       } else {
-                        _moviesBloc.add(
-                            AddWatchListEvent(
-                                movieDetails: details,
-                                uid: user.uid,
-                                mediaType: MediaType.TV));
+                        _moviesBloc.add(AddWatchListEvent(
+                            movieDetails: details,
+                            uid: user.uid,
+                            mediaType: MediaType.TV));
                       }
                     } else {
                       showDialog(
@@ -559,27 +564,26 @@ class WatchListButton extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Icon(state.watchListItem != null ?Icons.delete:Icons.add),
+                      Icon(state.watchListItem != null
+                          ? Icons.delete
+                          : Icons.add),
                       SizedBox(
                         width: 16,
                       ),
-                      Center(child: state.watchListItem == null ? Text(
-                          "Add to Watch List") : Text(
-                          "Remove from Watch List")),
+                      Center(
+                          child: state.watchListItem == null
+                              ? Text("Add to Watch List")
+                              : Text("Remove from Watch List")),
                     ],
                   ),
                 );
               }
               return SizedBox.shrink();
             },
-
           );
-
         }
         return SizedBox.shrink();
       },
     );
   }
 }
-
-

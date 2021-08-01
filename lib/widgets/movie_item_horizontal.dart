@@ -19,7 +19,7 @@ class MovieItemHorizontal extends StatelessWidget {
   }) : super(key: key);
 
   final Results movie;
-  final FirebaseUser user;
+  final User user;
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +53,20 @@ class MovieItemHorizontal extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
-                        imageUrl:movie.posterPath!=null? "${IMAGE_URL + movie.posterPath}":"",
+                        imageUrl: movie.posterPath != null
+                            ? "${IMAGE_URL + movie.posterPath}"
+                            : IMAGE_TEMP_URL,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Center(child: Shimmer.fromColors(
-                              baseColor: Colors.grey[700],
-                              highlightColor: Colors.grey[600],
-                              child: Container(
-                                color: Colors.grey,
-                                width: 100,
-                                height: MediaQuery.of(context).size.height,
-                              ),
-                            )),
+                        placeholder: (context, url) => Center(
+                            child: Shimmer.fromColors(
+                          baseColor: Colors.grey[700],
+                          highlightColor: Colors.grey[600],
+                          child: Container(
+                            color: Colors.grey,
+                            width: 100,
+                            height: MediaQuery.of(context).size.height,
+                          ),
+                        )),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     )),
@@ -109,7 +111,9 @@ class MovieItemHorizontal extends StatelessWidget {
                                   await new MovieRepository()
                                       .getMovieDetails(movie.id);
                               _moviesBloc.add(AddWatchListEvent(
-                                  movieDetails: movieDetails, uid: user.uid,mediaType: MediaType.MOVIE));
+                                  movieDetails: movieDetails,
+                                  uid: user.uid,
+                                  mediaType: MediaType.MOVIE));
                             },
                             child: Container(
                               height: 50,
@@ -143,13 +147,17 @@ class MovieItemHorizontal extends StatelessWidget {
           child: InkWell(
             onTap: () async {
               if (state.watchListItem != null) {
-                _moviesBloc.add(
-                    DeleteWatchListMovieItem(uid: user.uid, movieId: movie.id,mediaType: MediaType.MOVIE));
+                _moviesBloc.add(DeleteWatchListMovieItem(
+                    uid: user.uid,
+                    movieId: movie.id,
+                    mediaType: MediaType.MOVIE));
               } else {
                 MovieDetails movieDetails =
                     await new MovieRepository().getMovieDetails(movie.id);
                 _moviesBloc.add(AddWatchListEvent(
-                    movieDetails: movieDetails, uid: user.uid,mediaType: MediaType.MOVIE));
+                    movieDetails: movieDetails,
+                    uid: user.uid,
+                    mediaType: MediaType.MOVIE));
               }
             },
             child: Container(

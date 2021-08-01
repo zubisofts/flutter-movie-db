@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MovieDB/bloc/auth_bloc/bloc.dart';
 import 'package:MovieDB/pages/home.dart';

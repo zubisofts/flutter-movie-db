@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MovieDB/bloc/movies_bloc/movies_state.dart';
 
-import 'package:MovieDB/model/user.dart';
+import 'package:MovieDB/model/user.dart' as NUser;
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -15,7 +15,7 @@ class InitialAuthState extends AuthState {
 
 class LoggedInState extends AuthState {
 
-final FirebaseUser user;
+final User user;
   LoggedInState({
     this.user,
   });
@@ -33,7 +33,7 @@ class RegisterState extends AuthState{
 
 class RegisteredState extends AuthState {
 
-final User user;
+final NUser.User user;
   RegisteredState({
     this.user,
   });
@@ -83,7 +83,7 @@ final String error;
 }
 class AuthLoginState extends AuthState {
 
-final FirebaseUser user;
+final User user;
   AuthLoginState({
     this.user,
   });

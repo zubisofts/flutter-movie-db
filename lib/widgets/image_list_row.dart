@@ -103,7 +103,7 @@ class _ImageListState extends State<ImageList> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: CachedNetworkImage(
-        imageUrl: "${IMAGE_URL + image.filePath}",
+        imageUrl: image.filePath != null ? "${IMAGE_URL + image.filePath}" : IMAGE_TEMP_URL,
         fit: BoxFit.cover,
         placeholder: (context, url) => Center(
             child: Shimmer.fromColors(

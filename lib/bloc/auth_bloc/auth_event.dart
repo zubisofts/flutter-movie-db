@@ -45,7 +45,7 @@ class ListenToLoginEvent extends AuthEvent{
 
 class AuthStateChangedEvent extends AuthEvent {
 
-  final FirebaseUser user;
+  final User user;
   AuthStateChangedEvent({
     this.user,
   });

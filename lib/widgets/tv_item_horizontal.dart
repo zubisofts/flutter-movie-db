@@ -18,7 +18,7 @@ class TvItemHorizontal extends StatelessWidget {
   }) : super(key: key);
 
   final Result tv;
-  final FirebaseUser user;
+  final User user;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +32,7 @@ class TvItemHorizontal extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  TvDetailPage(id: tv.id)));
+              builder: (BuildContext context) => TvDetailPage(id: tv.id)));
         },
         child: Container(
 //        margin: EdgeInsets.all(10.0),
@@ -53,18 +52,20 @@ class TvItemHorizontal extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
-                        imageUrl:tv.posterPath!=null? "${IMAGE_URL + tv.posterPath}":"",
+                        imageUrl: tv.posterPath != null
+                            ? "${IMAGE_URL + tv.posterPath}"
+                            : IMAGE_TEMP_URL,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Center(child: Shimmer.fromColors(
-                              baseColor: Colors.grey[700],
-                              highlightColor: Colors.grey[600],
-                              child: Container(
-                                color: Colors.grey,
-                                width: 100,
-                                height: MediaQuery.of(context).size.height,
-                              ),
-                            )),
+                        placeholder: (context, url) => Center(
+                            child: Shimmer.fromColors(
+                          baseColor: Colors.grey[700],
+                          highlightColor: Colors.grey[600],
+                          child: Container(
+                            color: Colors.grey,
+                            width: 100,
+                            height: MediaQuery.of(context).size.height,
+                          ),
+                        )),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     )),
