@@ -1,4 +1,4 @@
-package com.example.flutter_ui_challenge;
+package com.zubisofts.moviedb;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity;
