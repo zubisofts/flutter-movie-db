@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "345863196723",
+    "project_id": "flutter-moviedb-ab628",
+    "storage_bucket": "flutter-moviedb-ab628.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:345863196723:android:bdb22d5d62ebe52976d346",
+        "android_client_info": {
+          "package_name": "com.zubisofts.moviedb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "345863196723-kp1oembcr14085rj0c55oh6h57ehr0v4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zubisofts.moviedb",
+            "certificate_hash": "a886f383f5f85b7cb24e71a78d9d58cace03c3c9"
+          }
+        },
+        {
+          "client_id": "345863196723-rufdd5p4hqdeqlv1cibhj6ee64k1h6q1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6XKxmiXgKMf-pAqNq-gGKkWeCA8K29nw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "345863196723-rufdd5p4hqdeqlv1cibhj6ee64k1h6q1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
