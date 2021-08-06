@@ -1,0 +1,39 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Dart
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
+
+      - name: Flutter action
+ 
+        uses: subosito/flutter-action@v1.5.3
+        with:
+          flutter-version: 2.2.3
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build Flutter apk
+        run: flutter build apk
+
+#       - name: Analyze project source
+#         run: flutter analyze
+
+#       - name: Run tests
+#         run: flutter test
+
